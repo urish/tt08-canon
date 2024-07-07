@@ -4,26 +4,37 @@ module pwm_sample (
     input wire clk,
     input wire rst_n,
 
-    input wire [11:0] divider,  // Ouput frequency is clk / (256 * (divider+1)), giving a minimum frequency of ~47Hz at a 50MHz clock
+    input wire [11:0] divider1,  // Ouput frequency is clk / (256 * (divider+1)), giving a minimum frequency of ~47Hz at a 50MHz clock
+    input wire [11:0] divider2,
 
-    output wire [7:0] sample
+    output reg [7:0] sample1,
+    output reg [7:0] sample2
 );
 
     // The sample is a complete wave over 256 entries.
     // Every divider+1 clocks, we move to the next entry in the table.
-    reg [11:0] count;
-    reg [7:0] sample_idx;
+    reg [11:0] count1;
+    reg [11:0] count2;
+    reg [7:0] sample_idx1;
+    reg [7:0] sample_idx2;
 
     always @(posedge clk) begin
         if (!rst_n) begin
-            count <= 0;
-            sample_idx <= 0;
+            count1 <= 0;
+            count2 <= 0;
+            sample_idx1 <= 0;
+            sample_idx2 <= 0;
         end
         else begin
-            count <= count - 1;
-            if (count == 0) begin
-                count <= divider;
-                sample_idx <= sample_idx + 1;
+            count1 <= count1 - 1;
+            count2 <= count2 - 1;
+            if (count1 == 0) begin
+                count1 <= divider1;
+                sample_idx1 <= sample_idx1 + 1;
+            end
+            if (count2 == 0) begin
+                count2 <= divider2;
+                sample_idx2 <= sample_idx2 + 1;
             end
         end
     end
@@ -290,6 +301,11 @@ module pwm_sample (
         endcase
     endfunction
 
-    assign sample = sample_rom(sample_idx);
+    wire [7:0] sample_mux = sample_rom(count1[0] ? sample_idx1 : sample_idx2);
+
+    always @(posedge clk) begin
+        if (count1[0]) sample1 <= sample_mux;
+        else sample2 <= sample_mux;
+    end
 
 endmodule
