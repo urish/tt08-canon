@@ -6,28 +6,42 @@ module pwm_sample (
 
     input wire [11:0] divider1,  // Ouput frequency is clk / (256 * (divider+1)), giving a minimum frequency of ~47Hz at a 50MHz clock
     input wire [11:0] divider2,
+    input wire [11:0] divider3,
+    input wire [11:0] divider4,
 
     output reg [7:0] sample1,
-    output reg [7:0] sample2
+    output reg [7:0] sample2,
+    output reg [7:0] sample3,
+    output reg [7:0] sample4
 );
 
     // The sample is a complete wave over 256 entries.
     // Every divider+1 clocks, we move to the next entry in the table.
     reg [11:0] count1;
     reg [11:0] count2;
+    reg [11:0] count3;
+    reg [11:0] count4;
     reg [7:0] sample_idx1;
     reg [7:0] sample_idx2;
+    reg [7:0] sample_idx3;
+    reg [7:0] sample_idx4;
 
     always @(posedge clk) begin
         if (!rst_n) begin
             count1 <= 0;
             count2 <= 0;
+            count3 <= 0;
+            count4 <= 0;
             sample_idx1 <= 0;
             sample_idx2 <= 0;
+            sample_idx3 <= 0;
+            sample_idx4 <= 0;
         end
         else begin
             count1 <= count1 - 1;
             count2 <= count2 - 1;
+            count3 <= count3 - 1;
+            count4 <= count4 - 1;
             if (count1 == 0) begin
                 count1 <= divider1;
                 sample_idx1 <= sample_idx1 + 1;
@@ -35,6 +49,14 @@ module pwm_sample (
             if (count2 == 0) begin
                 count2 <= divider2;
                 sample_idx2 <= sample_idx2 + 1;
+            end
+            if (count3 == 0) begin
+                count3 <= divider3;
+                sample_idx3 <= sample_idx3 + 1;
+            end
+            if (count4 == 0) begin
+                count4 <= divider4;
+                sample_idx4 <= sample_idx4 + 1;
             end
         end
     end
@@ -301,11 +323,25 @@ module pwm_sample (
         endcase
     endfunction
 
-    wire [7:0] sample_mux = sample_rom(count1[0] ? sample_idx1 : sample_idx2);
+    reg [7:0] sample_val;
+    always @* begin
+        case(count1[1:0])
+        0: sample_val = sample_idx1;
+        1: sample_val = sample_idx2;
+        2: sample_val = sample_idx3;
+        3: sample_val = sample_idx4;
+        endcase
+    end
+
+    wire [7:0] sample_mux = sample_rom(sample_val);
 
     always @(posedge clk) begin
-        if (count1[0]) sample1 <= sample_mux;
-        else sample2 <= sample_mux;
+        case(count1[1:0])
+        0: sample1 <= sample_mux;
+        1: sample2 <= sample_mux;
+        2: sample3 <= sample_mux;
+        3: sample4 <= sample_mux;
+        endcase
     end
 
 endmodule

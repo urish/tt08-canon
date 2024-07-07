@@ -17,6 +17,7 @@ pico_ice:
 	@grep "   Number of cells" yosys.log
 	@grep "     SB_DFF" yosys.log | awk '{sum+=$$2;}END{printf("     SB_DFF* %25d\n", sum);}'
 	@grep "     SB_LUT" yosys.log
+	@grep "     SB_RAM40_4K" yosys.log || true
 	@echo
 
 	# Place and route using nextpnr
