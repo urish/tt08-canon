@@ -16,12 +16,9 @@ module pwm_audio_top (
 );
     localparam CLOCK_FREQ = 40_000_000;
 
-  pwm_sine i_sine(
+  pwm_music i_music(
         .clk(clk),
         .rst_n(rst_n),
-
-        //.divider({ui_in, uio_in[3:0]}),
-        .divider({ui_in, 4'b0000}),
 
         .pwm(uo_out[7])
   );
@@ -30,6 +27,6 @@ module pwm_audio_top (
   assign uo_out[6:0] = 0;
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{uio_in, 1'b0};
+  wire _unused = &{uio_in[7:4], 1'b0};
 
 endmodule

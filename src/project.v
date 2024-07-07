@@ -16,11 +16,9 @@ module tt_um_pwm_example (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  pwm_sine i_sine(
+  pwm_music i_music(
         .clk(clk),
         .rst_n(rst_n),
-
-        .divider({ui_in, uio_in[3:0]}),
 
         .pwm(uo_out[7])
   );
@@ -31,6 +29,6 @@ module tt_um_pwm_example (
   assign uio_oe  = 0;
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, uio_in[7:4], 1'b0};
+  wire _unused = &{ena, uio_in, ui_in, 1'b0};
 
 endmodule
