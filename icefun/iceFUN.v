@@ -14,11 +14,11 @@ module pwm_audio_top (
     wire locked;
     wire clk;
 
-    // 50.25 MHz PLL
+    // 39.75 MHz PLL
     SB_PLL40_CORE #(
     .FEEDBACK_PATH("SIMPLE"),
     .DIVR(4'b0000),         // DIVR =  0
-    .DIVF(7'b1000010),      // DIVF = 66
+    .DIVF(7'd52),
     .DIVQ(3'b100),          // DIVQ =  4
     .FILTER_RANGE(3'b001)   // FILTER_RANGE = 1
     ) uut (

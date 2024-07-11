@@ -1,7 +1,5 @@
 `default_nettype none
 
-`define MUXIT
-
 module pwm_music (
     input wire clk,
     input wire rst_n,
@@ -10,29 +8,19 @@ module pwm_music (
 );
 
     // The PWM module converts the sample of our sine wave to a PWM output
-    wire [6:0] sample [0:3];
-    wire [11:0] cdivider;
-`ifdef MUXIT
-    reg [9:0] vdivider [1:3];
-`else
-    wire [9:0] vdivider [1:3];
-`endif
+    wire [11:0] divider;
     reg [25:0] count;
     reg [2:0] cello_note_idx;
-    reg [8:0] violin_note_idx [0:2];
-    reg [2:0] violin_duration_mask [0:2];
+    reg [8:0] violin_note_idx [1:3];
+    wire [2:0] violin_duration_mask;
 
-    wire [8:0] sample_for_pwm = (violin_note_idx[0][8:7] == 2'b11) ? 9'h40 : {2'b0, sample[0]} + 
-        ((vdivider[1] == 0) ? 9'h40 : {2'b0, sample[1]}) +
-        ((vdivider[2] == 0) ? 9'h40 : {2'b0, sample[2]}) +
-        ((vdivider[3] == 0) ? 9'h40 : {2'b0, sample[3]});
-//9'h80;
+    wire [7:0] sample_for_pwm;
 
     pwm_audio i_pwm(
         .clk(clk),
         .rst_n(rst_n),
 
-        .sample(sample_for_pwm[8:1]),
+        .sample(sample_for_pwm),
 
         .pwm(pwm)
     );
@@ -42,15 +30,11 @@ module pwm_music (
         .clk(clk),
         .rst_n(rst_n),
 
-        .divider1(cdivider),
-        .divider2(vdivider[1]),
-        .divider3(vdivider[2]),
-        .divider4(vdivider[3]),
+        .counter(count[11:0]),
 
-        .sample1(sample[0]),
-        .sample2(sample[1]),
-        .sample3(sample[2]),
-        .sample4(sample[3])
+        .divider(divider),
+
+        .sample(sample_for_pwm)
     );
 
     always @(posedge clk) begin
@@ -60,7 +44,7 @@ module pwm_music (
         end
         else begin
             count <= count + 1;
-            if (count == 0) begin
+            if (count[24:0] == 0) begin
                 cello_note_idx <= cello_note_idx + 1;
             end
         end
@@ -68,19 +52,23 @@ module pwm_music (
 
     genvar i;
     generate
-        for (i = 0; i < 3; i = i+1) begin
+        for (i = 1; i <= 3; i = i+1) begin
             always @(posedge clk) begin
                 if (!rst_n) begin
-                    violin_note_idx[i] <= 9'd511 - 8*(i+1);
+                    violin_note_idx[i] <= 9'd511 - 8*i;
                 end
                 else begin
-                    if (count[22:0] == 0 && (count[25:23] & violin_duration_mask[i]) == 0) begin
+                    if (count[21:0] == i && (count[24:22] & violin_duration_mask) == 0) begin
                         violin_note_idx[i] <= violin_note_idx[i] + 1;
-                        if (i > 0 && violin_note_idx[0] == 287) begin 
-                            violin_note_idx[i] <= 288+i;
-                        end
-                        if (violin_note_idx[0] == 288) begin
-                            violin_note_idx[i] <= 1-8*(i+1);
+                        if (i > 1) begin
+                            if (violin_note_idx[1] == 288) begin 
+                                violin_note_idx[i] <= 287+i;
+                            end
+                            if (violin_note_idx[1] == 512-7) begin
+                                violin_note_idx[i] <= 1-8*i;
+                            end
+                        end else if (violin_note_idx[1] == 288) begin 
+                            violin_note_idx[i] <= 512-7;
                         end
                     end
                 end
@@ -88,17 +76,17 @@ module pwm_music (
         end
     endgenerate
 
-    // Cello line for Canon, 50.25MHz project clock
+    // Cello line for Canon, 39.75MHz project clock
     function [11:0] cello_rom(input [2:0] idx);
         case (idx)
-0: cello_rom = 12'd1335;
-1: cello_rom = 12'd1783;
-2: cello_rom = 12'd1588;
-3: cello_rom = 12'd2121;
-4: cello_rom = 12'd2001;
-5: cello_rom = 12'd2672;
-6: cello_rom = 12'd2001;
-7: cello_rom = 12'd1783;
+0: cello_rom = 12'd1056;
+1: cello_rom = 12'd1410;
+2: cello_rom = 12'd1256;
+3: cello_rom = 12'd1677;
+4: cello_rom = 12'd1583;
+5: cello_rom = 12'd2113;
+6: cello_rom = 12'd1583;
+7: cello_rom = 12'd1410;
         endcase
     endfunction
 
@@ -395,68 +383,42 @@ module pwm_music (
     function [9:0] violin_freq(input [4:0] note);
         case (note)
 0: violin_freq = 10'd0;
-1: violin_freq = 10'd793;
-2: violin_freq = 10'd707;
-3: violin_freq = 10'd667;
-4: violin_freq = 10'd594;
-5: violin_freq = 10'd529;
-6: violin_freq = 10'd499;
-7: violin_freq = 10'd445;
-8: violin_freq = 10'd396;
-9: violin_freq = 10'd353;
-10: violin_freq = 10'd333;
-11: violin_freq = 10'd296;
-12: violin_freq = 10'd264;
-13: violin_freq = 10'd249;
-14: violin_freq = 10'd222;
-15: violin_freq = 10'd197;
-16: violin_freq = 10'd176;
-17: violin_freq = 10'd166;    
+1: violin_freq = 10'd627;
+2: violin_freq = 10'd559;
+3: violin_freq = 10'd527;
+4: violin_freq = 10'd470;
+5: violin_freq = 10'd418;
+6: violin_freq = 10'd395;
+7: violin_freq = 10'd351;
+8: violin_freq = 10'd313;
+9: violin_freq = 10'd279;
+10: violin_freq = 10'd263;
+11: violin_freq = 10'd234;
+12: violin_freq = 10'd208;
+13: violin_freq = 10'd197;
+14: violin_freq = 10'd175;
+15: violin_freq = 10'd156;
+16: violin_freq = 10'd139;
+17: violin_freq = 10'd131; 
 default: violin_freq = 10'dx;
         endcase
     endfunction
 
-    assign cdivider = cello_rom(cello_note_idx);
-
-`ifdef MUXIT
     reg [8:0] vnote_idx;
     always @* begin
-        case(count[2:1])
-        0: vnote_idx = violin_note_idx[0];
-        1: vnote_idx = violin_note_idx[0];
-        2: vnote_idx = violin_note_idx[1];
-        3: vnote_idx = violin_note_idx[2];
+        case(count[1:0])
+        0: vnote_idx = 9'dx;
+        1: vnote_idx = violin_note_idx[1];
+        2: vnote_idx = violin_note_idx[2];
+        3: vnote_idx = violin_note_idx[3];
         endcase
     end
 
     wire [6:0] violin_note_mux = violin_rom(vnote_idx);
     wire [9:0] violin_divider_mux = violin_freq(violin_note_mux[4:0]);
-    wire [2:0] violin_duration_mux = violin_note_mux[6:5] == 2'b10 ? 3'b111 : {1'b0,violin_note_mux[6:5]};
 
-    always @(posedge clk) begin
-        case(count[2:1])
-        0,1: begin
-            vdivider[1] <= violin_divider_mux;
-            violin_duration_mask[0] <= violin_duration_mux;
-        end
-        2: begin
-            vdivider[2] <= violin_divider_mux;
-            violin_duration_mask[1] <= violin_duration_mux;
-        end
-        3: begin
-            vdivider[3] <= violin_divider_mux;
-            violin_duration_mask[2] <= violin_duration_mux;
-        end
-        endcase
-    end
-`else
-
-    generate
-        for (i = 0; i < 3; i = i+1) begin
-            assign vdivider[i+1] = violin_rom(violin_note_idx[i]);
-        end
-    endgenerate
-
-`endif
+    wire [11:0] cdivider = (violin_note_idx[1][8:7] == 2'b11) ? 12'd0 : cello_rom(cello_note_idx);
+    assign divider = (count[1:0] == 2'b00) ? cdivider : {2'b00, violin_divider_mux};
+    assign violin_duration_mask = violin_note_mux[6:5] == 2'b10 ? 3'b111 : {1'b0,violin_note_mux[6:5]};
 
 endmodule

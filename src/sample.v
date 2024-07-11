@@ -4,59 +4,71 @@ module pwm_sample (
     input wire clk,
     input wire rst_n,
 
-    input wire [11:0] divider1,  // Ouput frequency is clk / (256 * (divider+1)), giving a minimum frequency of ~47Hz at a 50MHz clock
-    input wire [9:0] divider2,
-    input wire [9:0] divider3,
-    input wire [9:0] divider4,
-
-    output reg [6:0] sample1,
-    output reg [6:0] sample2,
-    output reg [6:0] sample3,
-    output reg [6:0] sample4
+    input wire [11:0] counter,
+    input wire [11:0] divider,  // Ouput frequency is clk / (256 * (divider+1)), giving a minimum frequency of ~47Hz at a 50MHz clock
+    output reg [7:0] sample
 );
 
     // The sample is a complete wave over 256 entries.
     // Every divider+1 clocks, we move to the next entry in the table.
-    reg [11:0] count1;
-    reg [9:0] count2;
-    reg [9:0] count3;
-    reg [9:0] count4;
+    reg [11:0] thresh1;
+    reg [9:0] thresh2;
+    reg [9:0] thresh3;
+    reg [9:0] thresh4;
     reg [7:0] sample_idx1;
     reg [7:0] sample_idx2;
     reg [7:0] sample_idx3;
     reg [7:0] sample_idx4;
+    reg [8:0] sample_acc;
+
+    reg [9:0] low_thresh;
+    always @* begin
+        case (counter[1:0])
+        0: low_thresh = thresh1[9:0];
+        1: low_thresh = thresh2;
+        2: low_thresh = thresh3;
+        3: low_thresh = thresh4;
+        endcase
+    end
+
+    wire compare = (counter[1:0] == 0) ? (counter - thresh1 < 12'd4) :
+                   (counter[9:0] - low_thresh < 10'd4);
+
+    wire divider_zero = divider == 0;
+
+    wire [11:0] next_thresh = {thresh1[11:10], low_thresh} + (divider_zero ? 12'd4 : divider);
 
     always @(posedge clk) begin
         if (!rst_n) begin
-            count1 <= 0;
-            count2 <= 0;
-            count3 <= 0;
-            count4 <= 0;
+            thresh1 <= 0;
+            thresh2 <= 0;
+            thresh3 <= 0;
+            thresh4 <= 0;
             sample_idx1 <= 0;
             sample_idx2 <= 0;
             sample_idx3 <= 0;
             sample_idx4 <= 0;
         end
         else begin
-            count1 <= count1 - 1;
-            count2 <= count2 - 1;
-            count3 <= count3 - 1;
-            count4 <= count4 - 1;
-            if (count1 == 0) begin
-                count1 <= divider1;
-                sample_idx1 <= sample_idx1 + 1;
-            end
-            if (count2 == 0) begin
-                count2 <= divider2;
-                sample_idx2 <= sample_idx2 + 1;
-            end
-            if (count3 == 0) begin
-                count3 <= divider3;
-                sample_idx3 <= sample_idx3 + 1;
-            end
-            if (count4 == 0) begin
-                count4 <= divider4;
-                sample_idx4 <= sample_idx4 + 1;
+            if (compare) begin
+                case (counter[1:0])
+                0: begin
+                    thresh1 <= next_thresh;
+                    sample_idx1 <= sample_idx1 + 1;
+                end
+                1: begin
+                    thresh2 <= next_thresh[9:0];
+                    sample_idx2 <= sample_idx2 + 1;
+                end
+                2: begin
+                    thresh3 <= next_thresh[9:0];
+                    sample_idx3 <= sample_idx3 + 1;
+                end
+                3: begin
+                    thresh4 <= next_thresh[9:0];
+                    sample_idx4 <= sample_idx4 + 1;
+                end
+                endcase
             end
         end
     end
@@ -325,7 +337,7 @@ module pwm_sample (
 
     reg [7:0] sample_val;
     always @* begin
-        case(count1[1:0])
+        case(counter[1:0])
         0: sample_val = sample_idx1;
         1: sample_val = sample_idx2;
         2: sample_val = sample_idx3;
@@ -333,15 +345,22 @@ module pwm_sample (
         endcase
     end
 
-    wire [6:0] sample_mux = sample_rom(sample_val);
+    wire [6:0] sample_mux = divider_zero ? 7'h40 : sample_rom(sample_val);
+    wire [8:0] sample_sum = sample_acc + {2'b00,sample_mux};
 
     always @(posedge clk) begin
-        case(count1[1:0])
-        0: sample1 <= sample_mux;
-        1: sample2 <= sample_mux;
-        2: sample3 <= sample_mux;
-        3: sample4 <= sample_mux;
-        endcase
+        if (!rst_n) begin
+            sample_acc <= 0;
+        end 
+        else begin
+            case(counter[1:0])
+            0,1,2: sample_acc <= sample_sum;
+            3: begin
+                sample <= sample_sum[8:1];
+                sample_acc <= 0;
+            end
+            endcase
+        end
     end
 
 endmodule
