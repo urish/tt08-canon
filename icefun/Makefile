@@ -2,16 +2,16 @@
 PROJ      = pwm_audio
 
 # Files
-FILES = iceFUN.v ../src/pwm.v ../src/sample.v ../src/music.v
+FILES = iceFUN.v ../src/pwm.v ../src/sample.v ../src/music.v ../src/display.sv ../src/timing.sv ../src/vga.sv
 
-.PHONY: iceFUN stats synth burn
+.PHONY: stats burn
 
-iceFUN:
+$(PROJ).bin: $(FILES)
 	# Lint
 	#verilator --lint-only -Wall -Wno-DECLFILENAME -Wno-MULTITOP $(FILES)
 
 	# synthesize using Yosys
-	yosys -p "synth_ice40 -abc9 -device u -dsp -top $(PROJ)_top -json $(PROJ).json" -DICE40 $(FILES) > yosys.log
+	yosys -p "scratchpad -copy abc9.script.flow3 abc9.script; synth_ice40 -abc9 -device u -dsp -top $(PROJ)_top -json $(PROJ).json" -DICE40 $(FILES) > yosys.log
 	@grep Warn yosys.log || true
 	@grep Error yosys.log || true
 	@grep "   Number of cells" yosys.log
@@ -42,6 +42,9 @@ stats:
 	@grep "     SB_DFF" yosys.log | awk '{sum+=$$2;}END{printf("| SB_DFF* | %d |\n", sum);}'
 	@grep "     SB_LUT" yosys.log | awk '{printf("| %s | %s |\n", $$1, $$2);}'
 	@grep "     ICESTORM_LC" nextpnr.log | awk '{gsub(/\//, "", $$3);printf("| ICE40 LCs | %s |\n", $$3);}'
+
+burn: $(PROJ).bin
+	iceFUNprog $(PROJ).bin
 
 clean:
 	rm $(PROJ).asc $(PROJ).bin $(PROJ).json

@@ -16,17 +16,44 @@ module tt_um_pwm_example (
     input  wire       rst_n     // reset_n - low to reset
 );
 
+    wire crotchet;
+    wire phrase;
+
   pwm_music i_music(
         .clk(clk),
         .rst_n(rst_n),
 
-        .pwm(uo_out[7])
+        .pwm(uio_out[7]),
+
+        .crotchet(crotchet),
+        .phrase(phrase)
   );
 
+    wire [5:0] video_colour;
+    wire vga_blank;
+    display i_display(
+        .clk(clk),
+        .rst_n(rst_n),
+
+        .crotchet(crotchet),
+        .phrase(phrase),
+
+        .hsync(uo_out[7]),
+        .vsync(uo_out[3]),
+        .blank(vga_blank),
+        .colour(video_colour)
+    );
+
+  assign uo_out[0] = vga_blank ? 1'b0 : video_colour[5];
+  assign uo_out[1] = vga_blank ? 1'b0 : video_colour[3];
+  assign uo_out[2] = vga_blank ? 1'b0 : video_colour[1];
+  assign uo_out[4] = vga_blank ? 1'b0 : video_colour[4];
+  assign uo_out[5] = vga_blank ? 1'b0 : video_colour[2];
+  assign uo_out[6] = vga_blank ? 1'b0 : video_colour[0];     
+
   // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out[6:0] = 0;
-  assign uio_out = 0;
-  assign uio_oe  = 0;
+  assign uio_out[6:0] = 0;
+  assign uio_oe  = 8'b10000000;
 
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, uio_in, ui_in, 1'b0};
