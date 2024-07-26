@@ -20,6 +20,7 @@ module display (
     logic [9:0] x_pos;
     logic [9:0] y_pos;
     logic next_frame;
+    logic next_row;
 
   vga i_vga (
     .clk        (clk),
@@ -29,7 +30,8 @@ module display (
     .blank      (blank),
     .x_pos      (x_pos),
     .y_pos      (y_pos),
-    .vsync_pulse(next_frame)
+    .vsync_pulse(next_frame),
+    .next_row   (next_row)
   );
 
     logic [3:0] mode;
@@ -50,16 +52,26 @@ module display (
         end
     end
 
-    logic [1:0] shift;
-    assign shift = (mode < 4) ? 2 : 
-                   (mode < 10) ? 1 : 0;
+    logic in_line;
+    line_render i_lr (
+        .clk(clk),
+        .rst_n(rst_n),
+        .mode(mode),
+        .frame(frame),
+        .x_pos(x_pos),
+        .y_pos(y_pos),
+        .next_frame(next_frame),
+        .next_row(next_row),
+        .in_line(in_line)
+    );
 
     always_ff @(posedge clk) begin
-        //if (y_pos == 418) colour = 6'h3f;
-        //else if (x_pos < (mode << 3) || y_pos < (frame >> 1)) colour <= 0;
-        //else colour <= x_pos + y_pos;
-        if (mode == 0) colour <= 1;
-        else colour <= x_pos + y_pos + (frame >> shift);
+        if (!rst_n) begin
+            colour <= 0;
+        end
+        else begin
+            colour <= in_line ? 6'h3c : 6'h01;
+        end
     end
 
 endmodule

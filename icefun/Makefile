@@ -2,7 +2,7 @@
 PROJ      = pwm_audio
 
 # Files
-FILES = iceFUN.v ../src/pwm.v ../src/sample.v ../src/music.v ../src/display.sv ../src/timing.sv ../src/vga.sv
+FILES = iceFUN.v ../src/pwm.v ../src/sample.v ../src/music.v ../src/display.sv ../src/timing.sv ../src/vga.sv ../src/line_render.sv
 
 .PHONY: stats burn
 
@@ -11,7 +11,7 @@ $(PROJ).bin: $(FILES)
 	#verilator --lint-only -Wall -Wno-DECLFILENAME -Wno-MULTITOP $(FILES)
 
 	# synthesize using Yosys
-	yosys -p "scratchpad -copy abc9.script.flow3 abc9.script; synth_ice40 -abc9 -device u -dsp -top $(PROJ)_top -json $(PROJ).json" -DICE40 $(FILES) > yosys.log
+	yosys -p "scratchpad -copy abc9.script.flow3 abc9.script; synth_ice40 -abc9 -device hx -top $(PROJ)_top -json $(PROJ).json" -DICE40 $(FILES) > yosys.log
 	@grep Warn yosys.log || true
 	@grep Error yosys.log || true
 	@grep "   Number of cells" yosys.log

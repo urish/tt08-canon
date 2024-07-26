@@ -25,7 +25,8 @@ module vga #(
     output logic blank,     // 1'b1 if in blank region
     output logic [9:0] x_pos,
     output logic [9:0] y_pos,
-    output logic vsync_pulse
+    output logic vsync_pulse,
+    output logic next_row
 );
 
     localparam HTOTAL = WIDTH + HFRONT + HSYNC + HBACK;
@@ -39,7 +40,6 @@ module vga #(
     logic hblank;
     logic vblank;
     logic vblank_w;
-    logic next_row;
     logic next_frame;
      
     // Horizontal timing
@@ -70,7 +70,7 @@ module vga #(
         .POLARITY       (1'b1)
     ) timing_ver (
         .clk        (clk),
-        .enable     (x_pos_internal == WIDTH - 1),
+        .enable     (next_row),
         .reset_n    (reset_n),
         .sync       (vsync),
         .blank      (vblank_w),
@@ -80,10 +80,9 @@ module vga #(
 
     assign blank = hblank || vblank;
     assign vsync_pulse = next_row && (y_pos_internal == -VBACK - VSYNC + 1);
-    //assign hsync_pulse = x_pos_internal == -HBACK;
 
-    assign x_pos = x_pos_internal[9:0];
-    assign y_pos = y_pos_internal[9:0];
+    assign x_pos = blank ? 10'd0 : x_pos_internal[9:0];
+    assign y_pos = blank ? 10'd0 : y_pos_internal[9:0];
 
     always_ff @(posedge clk) vblank <= vblank_w;
 
