@@ -6,14 +6,14 @@ module pwm_music (
 
     output wire pwm,
 
-    output wire crotchet,
-    output wire phrase
+    output wire [6:0] crotchet,
+    output wire crotchet_pulse
 );
 
     // The PWM module converts the sample of our sine wave to a PWM output
     wire [11:0] divider;
-    reg [28:0] count;
-    reg [2:0] cello_note_idx;
+    reg [31:0] count;
+    wire [2:0] cello_note_idx = count[27:25];
     reg [8:0] violin_note_idx [1:3];
     wire [2:0] violin_duration_mask;
 
@@ -40,19 +40,16 @@ module pwm_music (
         .sample(sample_for_pwm)
     );
 
-    assign crotchet = count[25:0] == 0;
-    assign phrase = crotchet && count[28:26] == 0;
+    assign crotchet = count[31:25];
+    assign crotchet_pulse = (count[24:0] == 0);
 
     always @(posedge clk) begin
         if (!rst_n) begin
             count <= 1;
-            cello_note_idx <= 0;
         end
         else begin
             count <= count + 1;
-            if (count[25:0] == 0) begin
-                cello_note_idx <= cello_note_idx + 1;
-            end
+            if (count[31:28] == 4'd13) count <= 0;
         end
     end
 
@@ -64,7 +61,7 @@ module pwm_music (
                     violin_note_idx[i] <= 9'd511 - 8*i;
                 end
                 else begin
-                    if (count[22:0] == i && (count[25:23] & violin_duration_mask) == 0) begin
+                    if (count[21:0] == i && (count[24:22] & violin_duration_mask) == 0) begin
                         violin_note_idx[i] <= violin_note_idx[i] + 1;
                         if (i > 1) begin
                             if (violin_note_idx[1] == 288) begin 
@@ -82,17 +79,17 @@ module pwm_music (
         end
     endgenerate
 
-    // Cello line for Canon, 42.75MHz project clock
+    // Cello line for Canon, 38MHz project clock
     function [11:0] cello_rom(input [2:0] idx);
         case (idx)
-0: cello_rom = 12'd1136;
-1: cello_rom = 12'd1517;
-2: cello_rom = 12'd1351;
-3: cello_rom = 12'd1804;
-4: cello_rom = 12'd1703;
-5: cello_rom = 12'd2273;
-6: cello_rom = 12'd1703;
-7: cello_rom = 12'd1517;
+0: cello_rom = 12'd956;
+1: cello_rom = 12'd1277;
+2: cello_rom = 12'd1137;
+3: cello_rom = 12'd1519;
+4: cello_rom = 12'd1433;
+5: cello_rom = 12'd1914;
+6: cello_rom = 12'd1433;
+7: cello_rom = 12'd1277;
         endcase
     endfunction
 
@@ -389,23 +386,23 @@ module pwm_music (
     function [9:0] violin_freq(input [4:0] note);
         case (note)
 0: violin_freq = 10'd0;
-1: violin_freq = 10'd675;
-2: violin_freq = 10'd601;
-3: violin_freq = 10'd567;
-4: violin_freq = 10'd505;
-5: violin_freq = 10'd450;
-6: violin_freq = 10'd425;
-7: violin_freq = 10'd378;
-8: violin_freq = 10'd337;
-9: violin_freq = 10'd300;
-10: violin_freq = 10'd283;
-11: violin_freq = 10'd252;
-12: violin_freq = 10'd224;
-13: violin_freq = 10'd212;
-14: violin_freq = 10'd188;
-15: violin_freq = 10'd168;
-16: violin_freq = 10'd149;
-17: violin_freq = 10'd141;
+1: violin_freq = 10'd568;
+2: violin_freq = 10'd506;
+3: violin_freq = 10'd477;
+4: violin_freq = 10'd425;
+5: violin_freq = 10'd379;
+6: violin_freq = 10'd357;
+7: violin_freq = 10'd318;
+8: violin_freq = 10'd283;
+9: violin_freq = 10'd252;
+10: violin_freq = 10'd238;
+11: violin_freq = 10'd212;
+12: violin_freq = 10'd189;
+13: violin_freq = 10'd178;
+14: violin_freq = 10'd158;
+15: violin_freq = 10'd141;
+16: violin_freq = 10'd125;
+17: violin_freq = 10'd118;
 default: violin_freq = 10'dx;
         endcase
     endfunction

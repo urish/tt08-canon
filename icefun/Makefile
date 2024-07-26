@@ -2,7 +2,7 @@
 PROJ      = pwm_audio
 
 # Files
-FILES = iceFUN.v ../src/pwm.v ../src/sample.v ../src/music.v ../src/display.sv ../src/timing.sv ../src/vga.sv ../src/line_render.sv
+FILES = iceFUN.v ../src/pwm.v ../src/sample.v ../src/music.v ../src/display.sv ../src/timing.sv ../src/vga.sv
 
 .PHONY: stats burn
 

@@ -17,11 +17,11 @@ module timing #(
     output logic sync,      // 1'b1 if in sync region
     output logic blank,     // 1'b1 if in blank region
     output logic next,      // 1'b1 if max value is reached
-    output logic signed [$clog2(TOTAL-1) : 0] counter // counter value
+    output logic signed [$clog2(TOTAL) : 0] counter // counter value
 );
 
     // Signal to trigger next counter in the chain
-    assign next = counter == RESOLUTION-1 && enable;
+    assign next = counter == RESOLUTION - 1 && enable;
     
     // Create the sync signal
     logic sync_tmp;

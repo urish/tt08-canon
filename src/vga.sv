@@ -5,18 +5,18 @@
 
     /*
         Default parameters are SVGA 800x600
-        clock = 42.75MHz for 66.58 Hz
+        clock = 36MHz for 56.25 Hz (a VESA standard DMT mode)
     */
 
 module vga #(
     parameter WIDTH=800,    // display width
     parameter HEIGHT=600,   // display height
-    parameter HFRONT=32,    // horizontal front porch
-    parameter HSYNC=80,     // horizontal sync
-    parameter HBACK=112,     // horizontal back porch
-    parameter VFRONT=3,    // vertical front porch
-    parameter VSYNC=4,      // vertical sync
-    parameter VBACK=20      // vertical back porch
+    parameter HFRONT=24,    // horizontal front porch
+    parameter HSYNC=72,     // horizontal sync
+    parameter HBACK=128,    // horizontal back porch
+    parameter VFRONT=1,     // vertical front porch
+    parameter VSYNC=2,      // vertical sync
+    parameter VBACK=22      // vertical back porch
 )(
     input  logic clk,       // clock
     input  logic reset_n,   // reset
@@ -26,18 +26,18 @@ module vga #(
     output logic [9:0] x_pos,
     output logic [9:0] y_pos,
     output logic vsync_pulse,
-    output logic next_row
+    output logic next_row,
+    output logic hblank
 );
 
     localparam HTOTAL = WIDTH + HFRONT + HSYNC + HBACK;
     localparam VTOTAL = HEIGHT + VFRONT + VSYNC + VBACK;
 
-    logic signed [$clog2(HTOTAL-1) : 0] x_pos_internal;
-    logic signed [$clog2(VTOTAL-1) : 0] y_pos_internal;
+    logic signed [$clog2(HTOTAL) : 0] x_pos_internal;
+    logic signed [$clog2(VTOTAL) : 0] y_pos_internal;
 
     /* Horizontal and Vertical Timing */
     
-    logic hblank;
     logic vblank;
     logic vblank_w;
     logic next_frame;
@@ -49,7 +49,7 @@ module vga #(
         .SYNC_PULSE     (HSYNC),
         .BACK_PORCH     (HBACK),
         .TOTAL          (HTOTAL),
-        .POLARITY       (1'b0)
+        .POLARITY       (1'b1)
     ) timing_hor (
         .clk        (clk),
         .enable     (1'b1),
@@ -85,5 +85,7 @@ module vga #(
     assign y_pos = blank ? 10'd0 : y_pos_internal[9:0];
 
     always_ff @(posedge clk) vblank <= vblank_w;
+
+    wire _unused = &{next_frame, 1'b0};
 
 endmodule

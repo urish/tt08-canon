@@ -20,7 +20,7 @@ module pwm_audio_top (
     SB_PLL40_CORE #(
     .FEEDBACK_PATH("SIMPLE"),
     .DIVR(4'b0000),         // DIVR =  0
-    .DIVF(7'd56),
+    .DIVF(7'd47),
     .DIVQ(3'b100),          // DIVQ =  4
     .FILTER_RANGE(3'b001)   // FILTER_RANGE = 1
     ) uut (
@@ -30,29 +30,30 @@ module pwm_audio_top (
     .REFERENCECLK(clk12MHz),
     .PLLOUTCORE(clk)
     );
+    wire rst_n = locked;
 
 
-    wire crotchet;
-    wire phrase;
+    wire [6:0] crotchet;
+    wire crotchet_pulse;
 
     pwm_music i_music(
         .clk(clk),
-        .rst_n(locked),
+        .rst_n(rst_n),
 
         .pwm(pwm),
 
         .crotchet(crotchet),
-        .phrase(phrase)
+        .crotchet_pulse(crotchet_pulse),
     );
 
     wire [5:0] video_colour;
     wire vga_blank;
     display i_display(
         .clk(clk),
-        .rst_n(locked),
+        .rst_n(rst_n),
 
         .crotchet(crotchet),
-        .phrase(phrase),
+        .crotchet_pulse(crotchet_pulse),
 
         .hsync(uo_out[7]),
         .vsync(uo_out[3]),

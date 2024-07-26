@@ -16,18 +16,20 @@ module tt_um_pwm_example (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-    wire crotchet;
-    wire phrase;
+    wire pwm;
 
-  pwm_music i_music(
+    wire [6:0] crotchet;
+    wire crotchet_pulse;
+
+    pwm_music i_music(
         .clk(clk),
         .rst_n(rst_n),
 
-        .pwm(uio_out[7]),
+        .pwm(pwm),
 
         .crotchet(crotchet),
-        .phrase(phrase)
-  );
+        .crotchet_pulse(crotchet_pulse)
+    );
 
     wire [5:0] video_colour;
     wire vga_blank;
@@ -36,13 +38,15 @@ module tt_um_pwm_example (
         .rst_n(rst_n),
 
         .crotchet(crotchet),
-        .phrase(phrase),
+        .crotchet_pulse(crotchet_pulse),
 
         .hsync(uo_out[7]),
         .vsync(uo_out[3]),
         .blank(vga_blank),
         .colour(video_colour)
     );
+
+  assign uio_out[7] = pwm;
 
   assign uo_out[0] = vga_blank ? 1'b0 : video_colour[5];
   assign uo_out[1] = vga_blank ? 1'b0 : video_colour[3];
