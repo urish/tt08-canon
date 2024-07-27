@@ -82,7 +82,7 @@ module vga #(
     assign vsync_pulse = next_row && (y_pos_internal == -VBACK - VSYNC + 1);
 
     assign x_pos = blank ? 10'd0 : x_pos_internal[9:0];
-    assign y_pos = blank ? 10'd0 : y_pos_internal[9:0];
+    assign y_pos = vblank ? 10'd0 : y_pos_internal[9:0];
 
     always_ff @(posedge clk) vblank <= vblank_w;
 

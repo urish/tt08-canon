@@ -9,8 +9,8 @@ from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer
 async def do_start(dut):
     dut._log.info("Start")
 
-    # 50MHz clock
-    clock = Clock(dut.clk, 20, units="ns")
+    # 36MHz clock
+    clock = Clock(dut.clk, 27.778, units="ns")
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
@@ -33,4 +33,4 @@ async def test_sine(dut):
 
     # Divider of 99 gives a frequency of 50MHz / 25600 = 1953.125Hz, a period of 512us
     dut.divider.value = 99
-    await Timer(2048, "us")
+    await Timer(10000, "us")

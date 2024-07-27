@@ -186,12 +186,18 @@ default: x_offset = 8'd0;
     logic [8:0] x_idx;
     assign x_idx = {y_idx, x_idx_r};
 
-    logic y_sel = next_row || hblank;
-    logic signed [2:-5] offset_in = y_sel ? y_offset(y_idx) : x_offset(x_idx);
-    logic signed [12:-5] scaled_offset = $signed(offset_in) * $signed({1'b0,frame});
-    logic [10:0] next_offset = (y_sel ? {1'b0, y_value(y_idx), 2'b00} : {1'b0, x_value(x_idx), 1'b0, x_idx[0]}) + scaled_offset[10:0];
+    logic y_sel;
+    logic signed [2:-5] offset_in;
+    logic signed [12:-5] scaled_offset;
+    logic [10:0] next_offset;
+    logic idx_match;
 
-    logic idx_match = next_offset[9:0] == (y_sel ? y_pos : x_pos);
+    assign y_sel = next_row || hblank;
+    assign offset_in = y_sel ? y_offset(y_idx) : x_offset(x_idx);
+    assign scaled_offset = $signed(offset_in) * $signed({1'b0,frame});
+    assign next_offset = (y_sel ? {1'b0, y_value(y_idx), 2'b00} : {1'b0, x_value(x_idx), 1'b0, x_idx[0]}) + scaled_offset[10:0];
+
+    assign idx_match = next_offset[9:0] == (y_sel ? y_pos : x_pos);
 
     always_ff @(posedge clk) begin
         if (!rst_n) begin
