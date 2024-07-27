@@ -21,7 +21,6 @@ module display (
     logic [9:0] y_pos;
     logic next_frame;
     logic next_row;
-    logic hblank;
 
   vga i_vga (
     .clk        (clk),
@@ -33,14 +32,13 @@ module display (
     .x_pos      (x_pos),
     .y_pos      (y_pos),
     .vsync_pulse(next_frame),
-    .next_row   (next_row),
-    .hblank     (hblank)
+    .next_row   (next_row)
   );
 
     // Frame control data - this controls the overall sequence.  There are
     // 13 phrases of 8 crotchets in total.
     function [6:0] y_idx_reset_value(input [6:0] idx);
-        case (idx[3:0])
+        case (idx[5:0])
         0,1,2,3,4: y_idx_reset_value = 7'd0;
         5,6,7: y_idx_reset_value = 7'd8;
         8: y_idx_reset_value = 7'd23;
@@ -51,7 +49,18 @@ module display (
         13: y_idx_reset_value = 7'd18;
         14: y_idx_reset_value = 7'd17;
         15: y_idx_reset_value = 7'd16;
-        default: y_idx_reset_value = 7'd16;
+        16,17,18,19,20,21,22,23: y_idx_reset_value = 7'd7;
+        48,49,50,51: y_idx_reset_value = 7'd0;
+        52,53,54,55: y_idx_reset_value = 7'd8;
+        56: y_idx_reset_value = 7'd23;
+        57: y_idx_reset_value = 7'd22;
+        58: y_idx_reset_value = 7'd21;
+        59: y_idx_reset_value = 7'd20;
+        60: y_idx_reset_value = 7'd19;
+        61: y_idx_reset_value = 7'd18;
+        62: y_idx_reset_value = 7'd17;
+        63: y_idx_reset_value = 7'd16;
+        default: y_idx_reset_value = 7'd15;
         endcase
     endfunction
 
@@ -61,10 +70,11 @@ module display (
         0: frame_reset_ctrl = 1'b1;
         8: frame_reset_ctrl = 1'b1;
         16: frame_reset_ctrl = 1'b1;
-        24: frame_reset_ctrl = 1'b1;
+        //24: frame_reset_ctrl = 1'b1;
         32: frame_reset_ctrl = 1'b1;
         40: frame_reset_ctrl = 1'b1;
         48: frame_reset_ctrl = 1'b1;
+        52: frame_reset_ctrl = 1'b1;
         56: frame_reset_ctrl = 1'b1;
         64: frame_reset_ctrl = 1'b1;
         72: frame_reset_ctrl = 1'b1;
@@ -78,7 +88,7 @@ module display (
     endfunction
 
     function frame_count_ctrl(input [6:0] idx);
-        case (idx[3:0])
+        case (idx[5:0])
         default: frame_count_ctrl = 1'b1;
         0: frame_count_ctrl = 1'b0;
         endcase
@@ -86,7 +96,7 @@ module display (
 
     logic [6:0] frame_crotchet;
 
-    logic [8:0] frame;  // Around 416 frames per phrase
+    logic [9:0] frame;  // Around 416 frames per phrase
 
     always_ff @(posedge clk) begin
         if (!rst_n) begin
@@ -110,6 +120,8 @@ module display (
     // Line data ROM: Y start/end values - Y coord / 2
     function [9:0] y_value(input [6:0] idx);
         case (idx)
+
+// Zooming T
  0: y_value = 10'd148;
  1: y_value = 10'd148;
  2: y_value = 10'd148;
@@ -117,6 +129,11 @@ module display (
  4: y_value = 10'd148;
  5: y_value = 10'd148;
  6: y_value = 10'h1ff;
+
+// Curtains
+ 7: y_value = 10'h1ff;
+
+// Static T
  8: y_value = 10'd52;
  9: y_value = 10'd86;
 10: y_value = 10'd115;
@@ -124,6 +141,11 @@ module display (
 12: y_value = 10'd174;
 13: y_value = 10'd239;
 14: y_value = 10'h1ff;
+
+// All inside
+15: y_value = 10'h1ff;
+
+// Descending blocks + scrolling T
 16: y_value = 10'd540;
 17: y_value = 10'd610;
 18: y_value = 10'd680;
@@ -153,6 +175,9 @@ default: y_value = 10'dx;
  4: y_offset = 8'd8;
  5: y_offset = 8'd28;
  6: y_offset = 8'd0;
+
+ 7: y_offset = 8'd0;
+ 
  8: y_offset = 8'd0;
  9: y_offset = 8'd0;
 10: y_offset = 8'd0;
@@ -182,47 +207,57 @@ default: y_offset = 8'dx;
     // Line data ROM: X start/end values, 4 per line - X coord / 2
     function [9:0] x_value(input [8:0] idx);
         case (idx)
-  4: x_value = 10'd200;
-  5: x_value = 10'd200;
+  4: x_value = 10'd199;
+  5: x_value = 10'd199;
   6: x_value = 10'h1ff;
   7: x_value = 10'h1ff;
-  8: x_value = 10'd200;
-  9: x_value = 10'd200;
+  8: x_value = 10'd199;
+  9: x_value = 10'd199;
  10: x_value = 10'h1ff;
  11: x_value = 10'h1ff;
- 12: x_value = 10'd200;
- 13: x_value = 10'd200;
+ 12: x_value = 10'd199;
+ 13: x_value = 10'd199;
  14: x_value = 10'h1ff;
  15: x_value = 10'h1ff;
- 16: x_value = 10'd200;
- 17: x_value = 10'd200;
- 18: x_value = 10'd200;
- 19: x_value = 10'd200;
- 20: x_value = 10'd200;
- 21: x_value = 10'd200;
+ 16: x_value = 10'd199;
+ 17: x_value = 10'd199;
+ 18: x_value = 10'd199;
+ 19: x_value = 10'd199;
+ 20: x_value = 10'd199;
+ 21: x_value = 10'd199;
  22: x_value = 10'h1ff;
  23: x_value = 10'h1ff;
 
- 36: x_value = 10'd111;
- 37: x_value = 10'd222;
+ 28: x_value = 10'd199;
+ 29: x_value = 10'd199;
+ 30: x_value = 10'h1ff;
+ 31: x_value = 10'h1ff;
+
+ 36: x_value = 10'd110;
+ 37: x_value = 10'd221;
  38: x_value = 10'h1ff;
  39: x_value = 10'h1ff;
- 40: x_value = 10'd151;
- 41: x_value = 10'd184;
+ 40: x_value = 10'd150;
+ 41: x_value = 10'd183;
  42: x_value = 10'h1ff;
  43: x_value = 10'h1ff;
- 44: x_value = 10'd151;
- 45: x_value = 10'd285;
+ 44: x_value = 10'd150;
+ 45: x_value = 10'd284;
  46: x_value = 10'h1ff;
  47: x_value = 10'h1ff;
- 48: x_value = 10'd151;
- 49: x_value = 10'd184;
- 50: x_value = 10'd213;
- 51: x_value = 10'd246;
- 52: x_value = 10'd213;
- 53: x_value = 10'd246;
+ 48: x_value = 10'd150;
+ 49: x_value = 10'd183;
+ 50: x_value = 10'd212;
+ 51: x_value = 10'd245;
+ 52: x_value = 10'd212;
+ 53: x_value = 10'd245;
  54: x_value = 10'h1ff;
  55: x_value = 10'h1ff;
+
+ 60: x_value = 10'd0;
+ 61: x_value = 10'h1ff;
+ 62: x_value = 10'h1ff;
+ 63: x_value = 10'h1ff;
 
  64: x_value = 10'd0;
  65: x_value = 10'h1ff;
@@ -257,24 +292,24 @@ default: y_offset = 8'dx;
  94: x_value = 10'h1ff;
  95: x_value = 10'h1ff;
 
-100: x_value = 10'd111;
-101: x_value = 10'd222;
+100: x_value = 10'd110;
+101: x_value = 10'd221;
 102: x_value = 10'h1ff;
 103: x_value = 10'h1ff;
-104: x_value = 10'd151;
-105: x_value = 10'd184;
+104: x_value = 10'd150;
+105: x_value = 10'd183;
 106: x_value = 10'h1ff;
 107: x_value = 10'h1ff;
-108: x_value = 10'd151;
-109: x_value = 10'd285;
+108: x_value = 10'd150;
+109: x_value = 10'd284;
 110: x_value = 10'h1ff;
 111: x_value = 10'h1ff;
-112: x_value = 10'd151;
-113: x_value = 10'd184;
-114: x_value = 10'd213;
-115: x_value = 10'd246;
-116: x_value = 10'd213;
-117: x_value = 10'd246;
+112: x_value = 10'd150;
+113: x_value = 10'd183;
+114: x_value = 10'd212;
+115: x_value = 10'd245;
+116: x_value = 10'd212;
+117: x_value = 10'd245;
 118: x_value = 10'h1ff;
 119: x_value = 10'h1ff;
 default: x_value = 10'h1ff;
@@ -304,6 +339,10 @@ default: x_value = 10'h1ff;
  21: x_offset = 8'd14;
  22: x_offset = 8'd0;
  23: x_offset = 8'd0;
+
+ 28: x_offset = -8'd30;
+ 29: x_offset = 8'd30;
+
 default: x_offset = 8'd0;
         endcase
     endfunction
@@ -359,7 +398,7 @@ default: x_offset = 8'd0;
     end    
 
     function [5:0] outside_colour(input [6:0] idx);
-        case (idx[4:0])
+        case (idx[5:0])
          0, 1, 2, 3, 4, 5, 6, 7: outside_colour = 6'h01;
          8, 9,10,11,12,13,14,15: outside_colour = 6'h01;
         16,17,18,19,20,21,22,23: outside_colour = 6'h3c;
@@ -369,14 +408,30 @@ default: x_offset = 8'd0;
     endfunction
 
     function [5:0] inside_colour(input [6:0] idx);
-        case (idx[4:0])
+        case (idx[5:0])
          0, 1, 2, 3, 4, 5, 6, 7: inside_colour = 6'h3c;
          8, 9,10,11,12,13,14,15: inside_colour = 6'h3c;
         16,17,18,19,20,21,22,23: inside_colour = 6'h00;
         24,25,26,27,28,29,30,31: inside_colour = 6'h00;
-        default: inside_colour = 6'h3c;
+        default: inside_colour = 6'h01;
         endcase
     endfunction
+
+    logic [9:0] abs_x;
+    logic [9:0] abs_y;
+    logic [9:0] diamond_dist;
+
+    always_comb begin : compute_abs
+        abs_x = x_pos - 400;
+        if (abs_x[9]) abs_x = -abs_x;
+
+        abs_y = y_pos - 300;
+        if (abs_y[9]) abs_y = -abs_y;
+
+        diamond_dist = abs_x + abs_y;
+    end
+
+    logic [6:1] frame_plus_dist = diamond_dist[6:1] + frame[6:1];
 
     always_ff @(posedge clk) begin
         if (!rst_n) begin
@@ -384,6 +439,21 @@ default: x_offset = 8'd0;
         end
         else begin
             colour <= in_line ? inside_colour(frame_crotchet) : outside_colour(frame_crotchet);
+            if (frame_crotchet[4]) begin
+                if (diamond_dist < {1'b0, frame[9:1]}) begin
+                    colour <= {1'b0, frame_crotchet[3], 1'b0, frame_crotchet[2], 1'b0, frame_crotchet[1]} * diamond_dist[3:2];
+                end
+            end
+            if (frame_crotchet[5]) begin
+                if (!frame_crotchet[4]) begin
+                    if (diamond_dist < 416) begin
+                        colour <= {1'b0, 1'b1, 1'b0, frame_crotchet[2], 1'b0, frame_crotchet[1]} * frame_plus_dist[3:2];
+                    end
+                end else begin
+                    if (in_line) colour <= (frame_crotchet[3:2] == 1) ? frame_plus_dist : diamond_dist[6:1];
+                    else colour <= 0;
+                end
+            end
         end
     end
 

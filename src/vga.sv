@@ -27,8 +27,7 @@ module vga #(
     output logic [9:0] x_pos,
     output logic [9:0] y_pos,
     output logic vsync_pulse,
-    output logic next_row,
-    output logic hblank
+    output logic next_row
 );
 
     localparam HTOTAL = WIDTH + HFRONT + HSYNC + HBACK;
@@ -46,6 +45,7 @@ module vga #(
     assign next_row = low_count == WIDTH - 1;
     logic hsync_tmp;
     logic hblank_tmp;
+    logic hblank;
     assign hsync_tmp = (low_count >= HTOTAL - HSYNC - HBACK) && (low_count < HTOTAL - HBACK);
     always_ff @(posedge clk)
         hsync <= hsync_tmp;
