@@ -7,8 +7,7 @@ module pwm_music (
     output wire pwm,
 
     output wire [9:0] low_count,
-    output wire [6:0] crotchet,
-    output wire crotchet_pulse
+    output wire [6:0] crotchet
 );
 
     // The PWM module converts the sample of our sine wave to a PWM output
@@ -43,7 +42,6 @@ module pwm_music (
 
     assign low_count = count[9:0];
     assign crotchet = count[31:25];
-    assign crotchet_pulse = (count[24:0] == 0);
 
     always @(posedge clk) begin
         if (!rst_n) begin

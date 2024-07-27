@@ -45,10 +45,13 @@ module vga #(
     // Horizontal timing
     assign next_row = low_count == WIDTH - 1;
     logic hsync_tmp;
+    logic hblank_tmp;
     assign hsync_tmp = (low_count >= HTOTAL - HSYNC - HBACK) && (low_count < HTOTAL - HBACK);
     always_ff @(posedge clk)
         hsync <= hsync_tmp;
-    assign hblank = low_count >= WIDTH;
+    assign hblank_tmp = low_count >= WIDTH - 1;
+    always_ff @(posedge clk)
+        hblank <= hblank_tmp;
 
     // Vertical timing
     timing #(

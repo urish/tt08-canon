@@ -20,7 +20,6 @@ module tt_um_pwm_example (
 
     wire [9:0] low_count;
     wire [6:0] crotchet;
-    wire crotchet_pulse;
 
     pwm_music i_music(
         .clk(clk),
@@ -29,8 +28,7 @@ module tt_um_pwm_example (
         .pwm(pwm),
 
         .low_count(low_count),
-        .crotchet(crotchet),
-        .crotchet_pulse(crotchet_pulse)
+        .crotchet(crotchet)
     );
 
     wire [5:0] video_colour;
@@ -41,7 +39,6 @@ module tt_um_pwm_example (
 
         .low_count(low_count),
         .crotchet(crotchet),
-        .crotchet_pulse(crotchet_pulse),
 
         .hsync(uo_out[7]),
         .vsync(uo_out[3]),

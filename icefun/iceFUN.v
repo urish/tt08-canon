@@ -17,7 +17,7 @@ module pwm_audio_top (
     wire locked;
     wire clk;
 
-    // 39.75 MHz PLL
+    // 36 MHz PLL
     SB_PLL40_CORE #(
     .FEEDBACK_PATH("SIMPLE"),
     .DIVR(4'b0000),         // DIVR =  0
@@ -36,7 +36,6 @@ module pwm_audio_top (
 
     wire [9:0] low_count;
     wire [6:0] crotchet;
-    wire crotchet_pulse;
 
     pwm_music i_music(
         .clk(clk),
@@ -45,8 +44,7 @@ module pwm_audio_top (
         .pwm(pwm),
 
         .low_count(low_count),
-        .crotchet(crotchet),
-        .crotchet_pulse(crotchet_pulse),
+        .crotchet(crotchet)
     );
 
     wire [5:0] video_colour;
@@ -57,7 +55,6 @@ module pwm_audio_top (
 
         .low_count(low_count),
         .crotchet(crotchet),
-        .crotchet_pulse(crotchet_pulse),
 
         .hsync(uo_out[7]),
         .vsync(uo_out[3]),

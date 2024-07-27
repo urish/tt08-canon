@@ -9,7 +9,6 @@ module display (
 
     input logic [9:0] low_count,
     input logic [6:0] crotchet,
-    input logic crotchet_pulse,
 
     output logic       hsync,
     output logic       vsync,
@@ -85,22 +84,20 @@ module display (
         endcase
     endfunction
 
+    logic [6:0] frame_crotchet;
 
-    logic reset_at_next_frame;
     logic [8:0] frame;  // Around 416 frames per phrase
 
     always_ff @(posedge clk) begin
         if (!rst_n) begin
             frame <= 0;
-            reset_at_next_frame <= 0;
-        end
-        else if (crotchet_pulse && frame_reset_ctrl(crotchet)) begin
-            reset_at_next_frame <= 1;
         end
         else if (next_frame) begin
-            if (reset_at_next_frame) frame <= 0;
-            else frame <= frame + {8'h0, frame_count_ctrl(crotchet)};
-            reset_at_next_frame <= 0;
+            frame_crotchet <= crotchet;
+            frame <= frame + {8'h0, frame_count_ctrl(crotchet)};
+            if (frame_crotchet != crotchet) begin
+                if (frame_reset_ctrl(crotchet)) frame <= 0;
+            end
         end
     end
 
@@ -322,13 +319,14 @@ default: x_offset = 8'd0;
     /* verilator lint_off UNUSEDSIGNAL */
     logic signed [12:-5] scaled_offset;
     /* verilator lint_on UNUSEDSIGNAL */
-    logic [10:0] xy_value = y_sel ? {y_value(y_idx), 1'b0} : {x_value(x_idx), x_idx[0]};
+    logic [10:0] xy_value;
     logic [10:0] next_offset;
     logic idx_match;
 
-    assign y_sel = next_row || hblank;
+    assign y_sel = next_row || hsync;
     assign offset_in = y_sel ? y_offset(y_idx) : x_offset(x_idx);
     assign scaled_offset = $signed(offset_in) * $signed({1'b0,frame});
+    assign xy_value = y_sel ? {y_value(y_idx), 1'b0} : {x_value(x_idx), x_idx[0]};
     assign next_offset = xy_value + scaled_offset[10:0];
 
     assign idx_match = next_offset == {1'b0, (y_sel ? y_pos : x_pos)};
@@ -360,13 +358,32 @@ default: x_offset = 8'd0;
         end
     end    
 
+    function [5:0] outside_colour(input [6:0] idx);
+        case (idx[4:0])
+         0, 1, 2, 3, 4, 5, 6, 7: outside_colour = 6'h01;
+         8, 9,10,11,12,13,14,15: outside_colour = 6'h01;
+        16,17,18,19,20,21,22,23: outside_colour = 6'h3c;
+        24,25,26,27,28,29,30,31: outside_colour = 6'h3c;
+        default: outside_colour = 6'h01;
+        endcase
+    endfunction
+
+    function [5:0] inside_colour(input [6:0] idx);
+        case (idx[4:0])
+         0, 1, 2, 3, 4, 5, 6, 7: inside_colour = 6'h3c;
+         8, 9,10,11,12,13,14,15: inside_colour = 6'h3c;
+        16,17,18,19,20,21,22,23: inside_colour = 6'h00;
+        24,25,26,27,28,29,30,31: inside_colour = 6'h00;
+        default: inside_colour = 6'h3c;
+        endcase
+    endfunction
 
     always_ff @(posedge clk) begin
         if (!rst_n) begin
             colour <= 0;
         end
         else begin
-            colour <= in_line ? 6'h3c : 6'h01;
+            colour <= in_line ? inside_colour(frame_crotchet) : outside_colour(frame_crotchet);
         end
     end
 
