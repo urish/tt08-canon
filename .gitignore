@@ -16,3 +16,4 @@ test/gate_level_netlist.v
 *.log
 *.uf2
 pwm_audio.json
+gds_render*

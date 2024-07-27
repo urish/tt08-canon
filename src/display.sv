@@ -72,7 +72,7 @@ module display (
         16: frame_reset_ctrl = 1'b1;
         //24: frame_reset_ctrl = 1'b1;
         32: frame_reset_ctrl = 1'b1;
-        40: frame_reset_ctrl = 1'b1;
+        //40: frame_reset_ctrl = 1'b1;
         48: frame_reset_ctrl = 1'b1;
         52: frame_reset_ctrl = 1'b1;
         56: frame_reset_ctrl = 1'b1;
@@ -431,7 +431,7 @@ default: x_offset = 8'd0;
         diamond_dist = abs_x + abs_y;
     end
 
-    logic [6:1] frame_plus_dist = diamond_dist[6:1] + frame[6:1];
+    logic [6:1] frame_plus_dist = diamond_dist[6:1] - frame[6:1];
 
     always_ff @(posedge clk) begin
         if (!rst_n) begin
