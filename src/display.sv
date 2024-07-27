@@ -40,7 +40,9 @@ module display (
     // 13 phrases of 8 crotchets in total.
     function [6:0] y_idx_reset_value(input [6:0] idx);
         case (idx)
-        default: y_idx_reset_value = 7'd0;
+        0,1,2,3,4: y_idx_reset_value = 7'd0;
+        5,6,7: y_idx_reset_value = 7'd8;
+        default: y_idx_reset_value = 7'd8;
         endcase
     endfunction
 
@@ -70,7 +72,6 @@ module display (
         case (idx[2:0])
         default: frame_count_ctrl = 1'b1;
         0: frame_count_ctrl = 1'b0;
-        5,6,7: frame_count_ctrl = 1'b0;
         endcase
     endfunction
 
@@ -102,13 +103,20 @@ module display (
     // Line data ROM: Y start/end values - Y coord / 4
     function [7:0] y_value(input [6:0] idx);
         case (idx)
- 0: y_value = 8'd74;  // 45
- 1: y_value = 8'd74;  // 55
- 2: y_value = 8'd74;  // 64
- 3: y_value = 8'd74;  // 74
- 4: y_value = 8'd74;  // 82
- 5: y_value = 8'd74; // 102
+ 0: y_value = 8'd74;
+ 1: y_value = 8'd74;
+ 2: y_value = 8'd74;
+ 3: y_value = 8'd74;
+ 4: y_value = 8'd74;
+ 5: y_value = 8'd74;
  6: y_value = 8'd255;
+ 8: y_value = 8'd27;
+ 9: y_value = 8'd43;
+10: y_value = 8'd58;
+11: y_value = 8'd74;
+12: y_value = 8'd87;
+13: y_value = 8'd120;
+14: y_value = 8'd255;
 default: y_value = 8'dx;
         endcase
     endfunction
@@ -116,13 +124,20 @@ default: y_value = 8'dx;
     // Line data ROM: Y time offset values - signed 2.5 fixed point
     function signed [2:-5] y_offset(input [6:0] idx);
         case (idx)
-0: y_offset = -8'd29;
-1: y_offset = -8'd19;
-2: y_offset = -8'd10;
-3: y_offset = 8'd0;
-4: y_offset = 8'd8;
-5: y_offset = 8'd28;
-6: y_offset = 8'd0;
+ 0: y_offset = -8'd29;
+ 1: y_offset = -8'd19;
+ 2: y_offset = -8'd10;
+ 3: y_offset = 8'd0;
+ 4: y_offset = 8'd8;
+ 5: y_offset = 8'd28;
+ 6: y_offset = 8'd0;
+ 8: y_offset = 8'd0;
+ 9: y_offset = 8'd0;
+10: y_offset = 8'd0;
+11: y_offset = 8'd0;
+12: y_offset = 8'd0;
+13: y_offset = 8'd0;
+14: y_offset = 8'd0;
 default: y_offset = 8'dx;
         endcase
     endfunction
@@ -150,6 +165,26 @@ default: y_offset = 8'dx;
  21: x_value = 8'd100;
  22: x_value = 8'd255;
  23: x_value = 8'd255;
+ 36: x_value = 8'd56;
+ 37: x_value = 8'd111;
+ 38: x_value = 8'd255;
+ 39: x_value = 8'd255;
+ 40: x_value = 8'd76;
+ 41: x_value = 8'd92;
+ 42: x_value = 8'd255;
+ 43: x_value = 8'd255;
+ 44: x_value = 8'd76;
+ 45: x_value = 8'd142;
+ 46: x_value = 8'd255;
+ 47: x_value = 8'd255;
+ 48: x_value = 8'd76;
+ 49: x_value = 8'd92;
+ 50: x_value = 8'd106;
+ 51: x_value = 8'd123;
+ 52: x_value = 8'd106;
+ 53: x_value = 8'd123;
+ 54: x_value = 8'd255;
+ 55: x_value = 8'd255;
 default: x_value = 8'd255;
         endcase
     endfunction    
@@ -232,7 +267,8 @@ default: x_offset = 8'd0;
             colour <= 0;
         end
         else begin
-            colour <= in_line ? 6'h3c : 6'h01;
+            if (y_pos == 100) colour <= 6'h3f;
+            else colour <= in_line ? 6'h3c : 6'h01;
         end
     end
 
