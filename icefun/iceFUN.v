@@ -7,6 +7,7 @@
 
 module pwm_audio_top (
         input clk12MHz,
+        input rst_btn,
 
         output pwm,
 
@@ -30,9 +31,10 @@ module pwm_audio_top (
     .REFERENCECLK(clk12MHz),
     .PLLOUTCORE(clk)
     );
-    wire rst_n = locked;
+    wire rst_n = locked & rst_btn;
 
 
+    wire [9:0] low_count;
     wire [6:0] crotchet;
     wire crotchet_pulse;
 
@@ -42,6 +44,7 @@ module pwm_audio_top (
 
         .pwm(pwm),
 
+        .low_count(low_count),
         .crotchet(crotchet),
         .crotchet_pulse(crotchet_pulse),
     );
@@ -52,6 +55,7 @@ module pwm_audio_top (
         .clk(clk),
         .rst_n(rst_n),
 
+        .low_count(low_count),
         .crotchet(crotchet),
         .crotchet_pulse(crotchet_pulse),
 

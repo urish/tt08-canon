@@ -17,7 +17,7 @@ module timing #(
     output logic sync,      // 1'b1 if in sync region
     output logic blank,     // 1'b1 if in blank region
     output logic next,      // 1'b1 if max value is reached
-    output logic signed [$clog2(TOTAL) : 0] counter // counter value
+    output logic signed [$clog2(TOTAL-1) : 0] counter // counter value
 );
 
     // Signal to trigger next counter in the chain
@@ -31,7 +31,7 @@ module timing #(
         sync <= POLARITY ? sync_tmp : ~sync_tmp;
 
     // Blanking
-    assign blank = counter <= 0;
+    assign blank = counter < 0;
 
     // Counter logic
     always_ff @(posedge clk) begin

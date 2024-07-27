@@ -18,6 +18,7 @@ module tt_um_pwm_example (
 
     wire pwm;
 
+    wire [9:0] low_count;
     wire [6:0] crotchet;
     wire crotchet_pulse;
 
@@ -27,6 +28,7 @@ module tt_um_pwm_example (
 
         .pwm(pwm),
 
+        .low_count(low_count),
         .crotchet(crotchet),
         .crotchet_pulse(crotchet_pulse)
     );
@@ -37,6 +39,7 @@ module tt_um_pwm_example (
         .clk(clk),
         .rst_n(rst_n),
 
+        .low_count(low_count),
         .crotchet(crotchet),
         .crotchet_pulse(crotchet_pulse),
 

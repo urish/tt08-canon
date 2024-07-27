@@ -20,6 +20,7 @@ module vga #(
 )(
     input  logic clk,       // clock
     input  logic reset_n,   // reset
+    input  logic [9:0] low_count, // counter for x
     output logic hsync,     // 1'b1 if in hsync region
     output logic vsync,     // 1'b1 if in vsync region
     output logic blank,     // 1'b1 if in blank region
@@ -33,8 +34,7 @@ module vga #(
     localparam HTOTAL = WIDTH + HFRONT + HSYNC + HBACK;
     localparam VTOTAL = HEIGHT + VFRONT + VSYNC + VBACK;
 
-    logic signed [$clog2(HTOTAL) : 0] x_pos_internal;
-    logic signed [$clog2(VTOTAL) : 0] y_pos_internal;
+    logic signed [$clog2(VTOTAL-1) : 0] y_pos_internal;
 
     /* Horizontal and Vertical Timing */
     
@@ -43,22 +43,12 @@ module vga #(
     logic next_frame;
      
     // Horizontal timing
-    timing #(
-        .RESOLUTION     (WIDTH),
-        .FRONT_PORCH    (HFRONT),
-        .SYNC_PULSE     (HSYNC),
-        .BACK_PORCH     (HBACK),
-        .TOTAL          (HTOTAL),
-        .POLARITY       (1'b1)
-    ) timing_hor (
-        .clk        (clk),
-        .enable     (1'b1),
-        .reset_n    (reset_n),
-        .sync       (hsync),
-        .blank      (hblank),
-        .next       (next_row),
-        .counter    (x_pos_internal)
-    );
+    assign next_row = low_count == WIDTH - 1;
+    logic hsync_tmp;
+    assign hsync_tmp = (low_count >= HTOTAL - HSYNC - HBACK) && (low_count < HTOTAL - HBACK);
+    always_ff @(posedge clk)
+        hsync <= hsync_tmp;
+    assign hblank = low_count >= WIDTH;
 
     // Vertical timing
     timing #(
@@ -81,7 +71,7 @@ module vga #(
     assign blank = hblank || vblank;
     assign vsync_pulse = next_row && (y_pos_internal == -VBACK - VSYNC + 1);
 
-    assign x_pos = blank ? 10'd0 : x_pos_internal[9:0];
+    assign x_pos = blank ? 10'd0 : low_count;
     assign y_pos = vblank ? 10'd0 : y_pos_internal[9:0];
 
     always_ff @(posedge clk) vblank <= vblank_w;

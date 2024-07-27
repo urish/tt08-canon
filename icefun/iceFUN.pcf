@@ -2,6 +2,8 @@
 
 set_io --warn-no-port clk12MHz	P7
 
+set_io --warn-no-port rst_btn	A5
+
 set_io --warn-no-port uo_out[0] B14
 set_io --warn-no-port uo_out[1] C12
 set_io --warn-no-port uo_out[2] H12

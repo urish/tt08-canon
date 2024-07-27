@@ -6,6 +6,7 @@ module pwm_music (
 
     output wire pwm,
 
+    output wire [9:0] low_count,
     output wire [6:0] crotchet,
     output wire crotchet_pulse
 );
@@ -40,6 +41,7 @@ module pwm_music (
         .sample(sample_for_pwm)
     );
 
+    assign low_count = count[9:0];
     assign crotchet = count[31:25];
     assign crotchet_pulse = (count[24:0] == 0);
 
@@ -49,7 +51,7 @@ module pwm_music (
         end
         else begin
             count <= count + 1;
-            if (count[31:28] == 4'd13) count <= 0;
+            if (count[31:29] == 3'd7) count <= 1;
         end
     end
 
