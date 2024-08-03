@@ -49,7 +49,7 @@ module pwm_music (
         end
         else begin
             count <= count + 1;
-            if (count[31:28] == 4'hf) count <= 1;
+            //if (count[31:28] == 4'hf) count <= 1;
         end
     end
 
@@ -67,11 +67,11 @@ module pwm_music (
                             if (violin_note_idx[1] == 288) begin 
                                 violin_note_idx[i] <= 287+i;
                             end
-                            if (violin_note_idx[1] == 497) begin
-                                violin_note_idx[i] <= 505-8*i;
+                            if (violin_note_idx[1] == 489) begin
+                                violin_note_idx[i] <= 497-8*i;
                             end
                         end else if (violin_note_idx[1] == 288) begin 
-                            violin_note_idx[i] <= 497;
+                            violin_note_idx[i] <= 489;
                         end
                     end
                 end
