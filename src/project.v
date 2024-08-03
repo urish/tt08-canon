@@ -27,6 +27,8 @@ module tt_um_pwm_example (
 
         .pwm(pwm),
 
+        .fast_start(ui_in[1:0]),
+
         .low_count(low_count),
         .crotchet(crotchet)
     );

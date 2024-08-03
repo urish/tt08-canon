@@ -41,6 +41,8 @@ module pwm_audio_top (
         .clk(clk),
         .rst_n(rst_n),
 
+        .fast_start(2'b00),
+
         .pwm(pwm),
 
         .low_count(low_count),

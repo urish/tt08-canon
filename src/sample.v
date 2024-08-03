@@ -4,14 +4,14 @@ module pwm_sample (
     input wire clk,
     input wire rst_n,
 
-    input wire [11:0] counter,
-    input wire [11:0] divider,  // Ouput frequency is clk / (256 * (divider+1)), giving a minimum frequency of ~47Hz at a 50MHz clock
+    input wire [10:0] counter,
+    input wire [10:0] divider,  // Ouput frequency is clk / (256 * (divider+1)), giving a minimum frequency of ~47Hz at a 50MHz clock
     output reg [7:0] sample
 );
 
     // The sample is a complete wave over 256 entries.
     // Every divider+1 clocks, we move to the next entry in the table.
-    reg [11:0] thresh1;
+    reg [10:0] thresh1;
     reg [9:0] thresh2;
     reg [9:0] thresh3;
     reg [9:0] thresh4;
@@ -31,12 +31,12 @@ module pwm_sample (
         endcase
     end
 
-    wire compare = (counter[1:0] == 0) ? (counter - thresh1 < 12'd4) :
+    wire compare = (counter[1:0] == 0) ? (counter - thresh1 < 11'd4) :
                    (counter[9:0] - low_thresh < 10'd4);
 
     wire divider_zero = divider == 0;
 
-    wire [11:0] next_thresh = {thresh1[11:10], low_thresh} + (divider_zero ? 12'd4 : divider);
+    wire [10:0] next_thresh = {thresh1[10], low_thresh} + (divider_zero ? 11'd4 : divider);
 
     always @(posedge clk) begin
         if (!rst_n) begin

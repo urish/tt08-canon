@@ -14,9 +14,9 @@ async def do_start(dut):
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
+    dut.ui_in.value = 2 # Fast start
     dut.uio_in.value = 0
     dut.rst_n.value = 1
-    dut.divider.value = 0
     await ClockCycles(dut.clk, 2)
 
     # Reset
@@ -28,9 +28,7 @@ async def do_start(dut):
 
 
 @cocotb.test()
-async def test_sine(dut):
+async def test_start(dut):
     await do_start(dut)
 
-    # Divider of 99 gives a frequency of 50MHz / 25600 = 1953.125Hz, a period of 512us
-    dut.divider.value = 99
-    await Timer(10000, "us")
+    await Timer(1000, "us")
