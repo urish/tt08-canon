@@ -38,7 +38,7 @@ module display (
     // Frame control data - this controls the overall sequence.  There are
     // 13 phrases of 8 crotchets in total.
     function [6:0] y_idx_reset_value(input [6:0] idx);
-        case (idx[5:0])
+        case (idx)
         0,1,2,3,4: y_idx_reset_value = 7'd0;
         5,6,7: y_idx_reset_value = 7'd8;
         8: y_idx_reset_value = 7'd23;
@@ -60,6 +60,16 @@ module display (
         61: y_idx_reset_value = 7'd18;
         62: y_idx_reset_value = 7'd17;
         63: y_idx_reset_value = 7'd16;
+        64,65,66,67: y_idx_reset_value = 7'd31;
+        68,69,70,71: y_idx_reset_value = 7'd32;
+        72,73,74,75: y_idx_reset_value = 7'd40;
+        76,77,78,79: y_idx_reset_value = 7'd35;
+        80: y_idx_reset_value = 7'd40;
+        81,82,83,84,85,86,87: y_idx_reset_value = 7'd38;
+        88,89,90,91: y_idx_reset_value = 7'd44;
+        104,105,106,107: y_idx_reset_value = 7'd0;
+        108,109,110,111: y_idx_reset_value = 7'd8;
+        112,113,114,115,116,117,118,119: y_idx_reset_value = 7'd8;
         default: y_idx_reset_value = 7'd15;
         endcase
     endfunction
@@ -74,10 +84,12 @@ module display (
         32: frame_reset_ctrl = 1'b1;
         //40: frame_reset_ctrl = 1'b1;
         48: frame_reset_ctrl = 1'b1;
-        52: frame_reset_ctrl = 1'b1;
+        52: frame_reset_ctrl = 1'b1; //
         56: frame_reset_ctrl = 1'b1;
         64: frame_reset_ctrl = 1'b1;
+        68: frame_reset_ctrl = 1'b1; //
         72: frame_reset_ctrl = 1'b1;
+        76: frame_reset_ctrl = 1'b1; //
         80: frame_reset_ctrl = 1'b1;
         88: frame_reset_ctrl = 1'b1;
         96: frame_reset_ctrl = 1'b1;
@@ -88,7 +100,7 @@ module display (
     endfunction
 
     function frame_count_ctrl(input [6:0] idx);
-        case (idx[5:0])
+        case (idx)
         default: frame_count_ctrl = 1'b1;
         0: frame_count_ctrl = 1'b0;
         endcase
@@ -161,6 +173,34 @@ module display (
 28: y_value = 10'd174;
 29: y_value = 10'd239;
 30: y_value = 10'h1ff;
+
+// Swipe right
+31: y_value = 10'h1ff;
+
+// Bounce - square diagnoally up
+32: y_value = 10'd299;
+33: y_value = 10'd329;
+34: y_value = 10'h1ff;
+
+// Two squares up
+35: y_value = 10'd299;
+36: y_value = 10'd329;
+37: y_value = 10'h1ff;
+
+// Expanding square
+38: y_value = 10'd960;
+39: y_value = 10'd970;
+
+// Bounce - square diagnoally down
+40: y_value = 10'd0;
+41: y_value = 10'd30;
+42: y_value = 10'h1ff;
+
+// Slide across
+44: y_value = 10'd0;
+45: y_value = 10'd299;
+46: y_value = 10'h1ff;
+
 default: y_value = 10'dx;
         endcase
     endfunction
@@ -185,6 +225,9 @@ default: y_value = 10'dx;
 12: y_offset = 8'd0;
 13: y_offset = 8'd0;
 14: y_offset = 8'd0;
+
+15: y_offset = 8'd0;
+
 16: y_offset = 8'd120;
 17: y_offset = 8'd114;
 18: y_offset = 8'd108;
@@ -200,6 +243,28 @@ default: y_value = 10'dx;
 28: y_offset = 8'd78;
 29: y_offset = 8'd78;
 30: y_offset = 8'd78;
+
+31: y_offset = 8'd0;
+
+32: y_offset = -8'd92;
+33: y_offset = -8'd92;
+34: y_offset = 8'd0;
+
+35: y_offset = -8'd92;
+36: y_offset = -8'd92;
+37: y_offset = 8'd0;
+
+38: y_offset = 8'd80;
+39: y_offset = 8'd120;
+
+40: y_offset = 8'd92;
+41: y_offset = 8'd92;
+42: y_offset = 8'd0;
+
+44: y_offset = 8'd46;
+45: y_offset = -8'd46;
+46: y_offset = 8'd0;
+
 default: y_offset = 8'dx;
         endcase
     endfunction
@@ -312,6 +377,40 @@ default: y_offset = 8'dx;
 117: x_value = 10'd245;
 118: x_value = 10'h1ff;
 119: x_value = 10'h1ff;
+
+124: x_value = 10'd0;
+125: x_value = 10'h1ff;
+126: x_value = 10'h1ff;
+127: x_value = 10'h1ff;
+
+132: x_value = 10'd0;
+133: x_value = 10'd26;
+134: x_value = 10'h1ff;
+135: x_value = 10'h1ff;
+
+144: x_value = 10'd0;
+145: x_value = 10'd0;
+146: x_value = 10'd100;
+147: x_value = 10'd124;
+
+156: x_value = 10'd0;
+157: x_value = 10'd0;
+
+164: x_value = 10'd208;
+165: x_value = 10'd234;
+166: x_value = 10'h1ff;
+167: x_value = 10'h1ff;
+
+176: x_value = 10'd399;
+177: x_value = 10'h1ff;
+178: x_value = 10'h1ff;
+179: x_value = 10'h1ff;
+184: x_value = 10'd0;
+185: x_value = 10'h0;
+186: x_value = 10'h1ff;
+187: x_value = 10'h1ff;
+
+
 default: x_value = 10'h1ff;
         endcase
     endfunction    
@@ -342,6 +441,25 @@ default: x_value = 10'h1ff;
 
  28: x_offset = -8'd30;
  29: x_offset = 8'd30;
+
+ 124: x_offset = 8'd120;
+
+ 132: x_offset = 8'd64;
+ 133: x_offset = 8'd64;
+
+ 144: x_offset = 8'd64;
+ 145: x_offset = 8'd72;
+ 146: x_offset = 8'd79;
+ 147: x_offset = 8'd79;
+
+ 156: x_offset = 8'd40;
+ 157: x_offset = 8'd80;
+
+ 164: x_offset = 8'd90;
+ 165: x_offset = 8'd90;
+
+ 176: x_offset = -8'd123;
+ 185: x_offset = 8'd123;
 
 default: x_offset = 8'd0;
         endcase
@@ -397,7 +515,7 @@ default: x_offset = 8'd0;
         end
     end    
 
-    function [5:0] outside_colour(input [6:0] idx);
+    function [5:0] outside_colour(input [5:0] idx);
         case (idx[5:0])
          0, 1, 2, 3, 4, 5, 6, 7: outside_colour = 6'h01;
          8, 9,10,11,12,13,14,15: outside_colour = 6'h01;
@@ -407,7 +525,7 @@ default: x_offset = 8'd0;
         endcase
     endfunction
 
-    function [5:0] inside_colour(input [6:0] idx);
+    function [5:0] inside_colour(input [5:0] idx);
         case (idx[5:0])
          0, 1, 2, 3, 4, 5, 6, 7: inside_colour = 6'h3c;
          8, 9,10,11,12,13,14,15: inside_colour = 6'h3c;
@@ -416,6 +534,27 @@ default: x_offset = 8'd0;
         default: inside_colour = 6'h01;
         endcase
     endfunction
+
+    function [5:0] rainbow(input [3:0] idx);
+        case (idx)
+ 0: rainbow = 6'h30;
+ 1: rainbow = 6'h34;
+ 2: rainbow = 6'h38;
+ 3: rainbow = 6'h2c;
+ 4: rainbow = 6'h1c;
+ 5: rainbow = 6'h0c;
+ 6: rainbow = 6'h0d;
+ 7: rainbow = 6'h0e;
+ 8: rainbow = 6'h0b;
+ 9: rainbow = 6'h07;
+10: rainbow = 6'h03;
+11: rainbow = 6'h03;
+12: rainbow = 6'h13;
+13: rainbow = 6'h23;
+14: rainbow = 6'h32;
+15: rainbow = 6'h31;
+        endcase
+    endfunction        
 
     logic [9:0] abs_x;
     logic [9:0] abs_y;
@@ -431,30 +570,57 @@ default: x_offset = 8'd0;
         diamond_dist = abs_x + abs_y;
     end
 
-    logic [6:1] frame_plus_dist = diamond_dist[6:1] - frame[6:1];
+    logic [6:1] frame_plus_dist;
+    assign frame_plus_dist = diamond_dist[6:1] - frame[6:1];
+
+    // For 010_x
+    logic [2:0] diamond_colour_red;
+    assign diamond_colour_red = {1'b0, frame_crotchet[3], ~frame_crotchet[3]} * frame_plus_dist[3:2];
+
+    logic [1:0] diamond_colour_g;
+    assign diamond_colour_g = frame_crotchet[2] ? frame_plus_dist[3:2] : 0;
+
+    logic [1:0] diamond_colour_b;
+    assign diamond_colour_b = frame_crotchet[1] ? frame_plus_dist[3:2] : 0;
+
+    // For 10x_x
+    logic [5:0] rainbow_colour;
+    assign rainbow_colour = rainbow(y_pos[6:3] + ((frame_crotchet[5:4] == 2'b01) ? frame[4:1] : 4'h0));
 
     always_ff @(posedge clk) begin
         if (!rst_n) begin
             colour <= 0;
         end
         else begin
-            colour <= in_line ? inside_colour(frame_crotchet) : outside_colour(frame_crotchet);
-            if (frame_crotchet[4]) begin
-                if (diamond_dist < {1'b0, frame[9:1]}) begin
-                    colour <= {1'b0, frame_crotchet[3], 1'b0, frame_crotchet[2], 1'b0, frame_crotchet[1]} * diamond_dist[3:2];
-                end
-            end
-            if (frame_crotchet[5]) begin
-                if (!frame_crotchet[4]) begin
-                    if (diamond_dist < 416) begin
-                        colour <= {1'b0, 1'b1, 1'b0, frame_crotchet[2], 1'b0, frame_crotchet[1]} * frame_plus_dist[3:2];
-                    end
+            if (frame_crotchet[6]) begin
+                if (frame_crotchet[5:2] == 0) begin
+                    if (in_line) colour <= diamond_dist[6:1];
+                    else colour <= {1'b0, rainbow_colour[5], 1'b0, rainbow_colour[3], 1'b0, rainbow_colour[1]};
                 end else begin
-                    if (in_line) colour <= (frame_crotchet[3:2] == 1) ? frame_plus_dist : diamond_dist[6:1];
-                    else colour <= 0;
+                    if (in_line) colour <= rainbow_colour;
+                    else colour <= {1'b0, rainbow_colour[5], 1'b0, rainbow_colour[3], 1'b0, rainbow_colour[1]};
+                end
+            end else begin
+                colour <= in_line ? inside_colour(frame_crotchet[5:0]) : outside_colour(frame_crotchet[5:0]);
+                if (frame_crotchet[4]) begin
+                    if (diamond_dist < {1'b0, frame[9:1]}) begin
+                        colour <= {1'b0, frame_crotchet[3], 1'b0, frame_crotchet[2], 1'b0, frame_crotchet[1]} * diamond_dist[3:2];
+                    end
+                end
+                if (frame_crotchet[5]) begin
+                    if (!frame_crotchet[4]) begin
+                        if (diamond_dist < 416) begin
+                            colour <= {diamond_colour_red[2:1], diamond_colour_g, diamond_colour_b};
+                        end
+                    end else begin
+                        if (in_line) colour <= frame_crotchet[2] ? frame_plus_dist : diamond_dist[6:1];
+                        else colour <= 0;
+                    end
                 end
             end
         end
     end
+
+    wire _unused = &{diamond_colour_red[0], 1'b0};
 
 endmodule

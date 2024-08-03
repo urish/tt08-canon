@@ -49,7 +49,7 @@ module pwm_music (
         end
         else begin
             count <= count + 1;
-            if (count[31:29] == 3'd7) count <= 1;
+            if (count[31:28] == 4'hf) count <= 1;
         end
     end
 
@@ -67,11 +67,11 @@ module pwm_music (
                             if (violin_note_idx[1] == 288) begin 
                                 violin_note_idx[i] <= 287+i;
                             end
-                            if (violin_note_idx[1] == 505) begin  // 512-7
-                                violin_note_idx[i] <= 1-8*i;
+                            if (violin_note_idx[1] == 497) begin
+                                violin_note_idx[i] <= 505-8*i;
                             end
                         end else if (violin_note_idx[1] == 288) begin 
-                            violin_note_idx[i] <= 505;
+                            violin_note_idx[i] <= 497;
                         end
                     end
                 end
@@ -79,7 +79,7 @@ module pwm_music (
         end
     endgenerate
 
-    // Cello line for Canon, 38MHz project clock
+    // Cello line for Canon, 36MHz project clock
     function [11:0] cello_rom(input [2:0] idx);
         case (idx)
 0: cello_rom = 12'd956;
