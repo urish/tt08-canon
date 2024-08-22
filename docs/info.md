@@ -9,17 +9,13 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-The project generates a PWM output approximating a sine wave of configurable frequency.
-
-The tone generated is of frequency `project clock / (256 * (divider + 1))`
+The project plays Pachelbel’s Canon along with some fun visuals.
 
 ## How to test
 
-Set {in[7:0], uio[3:0]} to the desired divider:
-
-- A divider of 443 {0001 1011, 1011} should give approximately 440Hz
-- A divider of 747 {0010 1110, 1011} should give approximately middle C
+Set the inputs to 0, clock at 36MHz.
 
 ## External hardware
 
-Tiny Tapeout [Audio Pmod](https://github.com/MichaelBell/tt-audio-pmod)
+Tiny Tapeout [Audio Pmod](https://github.com/MichaelBell/tt-audio-pmod) in the bidir
+[Tiny VGA Pmod](https://github.com/mole99/tiny-vga) in the output
