@@ -36,12 +36,12 @@ module timing #(
     // Counter logic
     always_ff @(posedge clk) begin
         if (!reset_n) begin
-            counter <= -FRONT_PORCH - SYNC_PULSE - BACK_PORCH + 1;
+            counter <= -FRONT_PORCH - SYNC_PULSE - BACK_PORCH;
         end else begin
             if (enable) begin
                 counter <= counter + 1;
                 if (next) begin
-                    counter <= -FRONT_PORCH - SYNC_PULSE - BACK_PORCH + 1;
+                    counter <= -FRONT_PORCH - SYNC_PULSE - BACK_PORCH;
                 end
             end
         end
