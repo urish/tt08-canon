@@ -35,7 +35,7 @@ module latch_reg #(
     wire gated_clk;
 
     sky130_fd_sc_hd__inv_1 CLKINV(.Y(clk_b), .A(clk));
-    sky130_fd_sc_hd__dlclkp_1 CG( .CLK(clk_b), .GCLK(gated_clk), .GATE(wen) );
+    sky130_fd_sc_hd__dlclkp_4 CG( .CLK(clk_b), .GCLK(gated_clk), .GATE(wen) );
 
     genvar i;
     generate
