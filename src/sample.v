@@ -25,9 +25,9 @@ module pwm_sample (
     always @(posedge clk) begin
         case (counter[1:0])
         3: thresh <= thresh1;
-        0: thresh <= {counter[10], thresh2};
-        1: thresh <= {counter[10], thresh3};
-        2: thresh <= {counter[10], thresh4};
+        0: thresh <= {1'b0, thresh2};
+        1: thresh <= {1'b0, thresh3};
+        2: thresh <= {1'b0, thresh4};
         endcase
     end
 
@@ -41,8 +41,7 @@ module pwm_sample (
         endcase
     end
 
-    wire wen = (counter[1:0] == 0) ? (counter - thresh < 11'd4) :
-                   (counter[9:0] - thresh[9:0] < 10'd4);
+    wire wen = ((counter[1:0] == 0) ? counter : {counter[9:0], 1'b0}) - ((counter[1:0] == 0) ? thresh : {thresh[9:0], 1'b0}) < 11'd8;
     wire wen1 = !rst_n || (wen && (counter[1:0] == 2'b00));
     wire wen2 = !rst_n || (wen && (counter[1:0] == 2'b01));
     wire wen3 = !rst_n || (wen && (counter[1:0] == 2'b10));
