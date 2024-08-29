@@ -52,55 +52,29 @@ module pwm_sample (
     wire [10:0] next_thresh = rst_n ? (thresh + (divider_zero ? 11'd4 : divider)) : 0;
     wire [7:0] next_sample_idx = rst_n ? (sample_idx + 1) : 0;
 
-    latch_reg #(.WIDTH(11)) t1(
+    latch_reg #(.WIDTH(11 + 8)) t1(
         .clk(clk),
         .wen(wen1),
-        .data_in(next_thresh),
-        .data_out(thresh1)
+        .data_in({next_thresh, next_sample_idx}),
+        .data_out({thresh1, sample_idx1})
         );
-    latch_reg #(.WIDTH(10)) t2(
+    latch_reg #(.WIDTH(10 + 8)) t2(
         .clk(clk),
         .wen(wen2),
-        .data_in(next_thresh[9:0]),
-        .data_out(thresh2)
+        .data_in({next_thresh[9:0], next_sample_idx}),
+        .data_out({thresh2, sample_idx2})
         );
-    latch_reg #(.WIDTH(10)) t3(
+    latch_reg #(.WIDTH(10 + 8)) t3(
         .clk(clk),
         .wen(wen3),
-        .data_in(next_thresh[9:0]),
-        .data_out(thresh3)
+        .data_in({next_thresh[9:0], next_sample_idx}),
+        .data_out({thresh3, sample_idx3})
         );
-    latch_reg #(.WIDTH(10)) t4(
+    latch_reg #(.WIDTH(10 + 8)) t4(
         .clk(clk),
         .wen(wen4),
-        .data_in(next_thresh[9:0]),
-        .data_out(thresh4)
-        );
-
-
-    latch_reg #(.WIDTH(8)) s1(
-        .clk(clk),
-        .wen(wen1),
-        .data_in(next_sample_idx),
-        .data_out(sample_idx1)
-        );
-    latch_reg #(.WIDTH(8)) s2(
-        .clk(clk),
-        .wen(wen2),
-        .data_in(next_sample_idx),
-        .data_out(sample_idx2)
-        );
-    latch_reg #(.WIDTH(8)) s3(
-        .clk(clk),
-        .wen(wen3),
-        .data_in(next_sample_idx),
-        .data_out(sample_idx3)
-        );
-    latch_reg #(.WIDTH(8)) s4(
-        .clk(clk),
-        .wen(wen4),
-        .data_in(next_sample_idx),
-        .data_out(sample_idx4)
+        .data_in({next_thresh[9:0], next_sample_idx}),
+        .data_out({thresh4, sample_idx4})
         );
 
     // From a cello
