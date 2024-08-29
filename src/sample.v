@@ -5,73 +5,104 @@ module pwm_sample (
     input wire rst_n,
 
     input wire [10:0] counter,
-    input wire [10:0] divider,  // Ouput frequency is clk / (256 * (divider+1)), giving a minimum frequency of ~47Hz at a 50MHz clock
+    input wire [10:0] divider,
     output reg [7:0] sample
 );
 
     // The sample is a complete wave over 256 entries.
     // Every divider+1 clocks, we move to the next entry in the table.
-    reg [10:0] thresh1;
-    reg [9:0] thresh2;
-    reg [9:0] thresh3;
-    reg [9:0] thresh4;
-    reg [7:0] sample_idx1;
-    reg [7:0] sample_idx2;
-    reg [7:0] sample_idx3;
-    reg [7:0] sample_idx4;
+    wire [10:0] thresh1;
+    wire [9:0] thresh2;
+    wire [9:0] thresh3;
+    wire [9:0] thresh4;
+    wire [7:0] sample_idx1;
+    wire [7:0] sample_idx2;
+    wire [7:0] sample_idx3;
+    wire [7:0] sample_idx4;
     reg [8:0] sample_acc;
 
-    reg [9:0] low_thresh;
-    always @* begin
+    reg [10:0] thresh;
+    always @(posedge clk) begin
         case (counter[1:0])
-        0: low_thresh = thresh1[9:0];
-        1: low_thresh = thresh2;
-        2: low_thresh = thresh3;
-        3: low_thresh = thresh4;
+        3: thresh <= thresh1;
+        0: thresh <= {counter[10], thresh2};
+        1: thresh <= {counter[10], thresh3};
+        2: thresh <= {counter[10], thresh4};
         endcase
     end
 
-    wire compare = (counter[1:0] == 0) ? (counter - thresh1 < 11'd4) :
-                   (counter[9:0] - low_thresh < 10'd4);
+    reg [7:0] sample_idx;
+    always @(posedge clk) begin
+        case (counter[1:0])
+        3: sample_idx <= sample_idx1;
+        0: sample_idx <= sample_idx2;
+        1: sample_idx <= sample_idx3;
+        2: sample_idx <= sample_idx4;
+        endcase
+    end
+
+    wire wen = (counter[1:0] == 0) ? (counter - thresh < 11'd4) :
+                   (counter[9:0] - thresh[9:0] < 10'd4);
+    wire wen1 = !rst_n || (wen && (counter[1:0] == 2'b00));
+    wire wen2 = !rst_n || (wen && (counter[1:0] == 2'b01));
+    wire wen3 = !rst_n || (wen && (counter[1:0] == 2'b10));
+    wire wen4 = !rst_n || (wen && (counter[1:0] == 2'b11));
 
     wire divider_zero = divider == 0;
 
-    wire [10:0] next_thresh = {thresh1[10], low_thresh} + (divider_zero ? 11'd4 : divider);
+    wire [10:0] next_thresh = rst_n ? (thresh + (divider_zero ? 11'd4 : divider)) : 0;
+    wire [7:0] next_sample_idx = rst_n ? (sample_idx + 1) : 0;
 
-    always @(posedge clk) begin
-        if (!rst_n) begin
-            thresh1 <= 0;
-            thresh2 <= 0;
-            thresh3 <= 0;
-            thresh4 <= 0;
-            sample_idx1 <= 0;
-            sample_idx2 <= 0;
-            sample_idx3 <= 0;
-            sample_idx4 <= 0;
-        end
-        else begin
-            if (compare) begin
-                case (counter[1:0])
-                0: begin
-                    thresh1 <= next_thresh;
-                    sample_idx1 <= sample_idx1 + 1;
-                end
-                1: begin
-                    thresh2 <= next_thresh[9:0];
-                    sample_idx2 <= sample_idx2 + 1;
-                end
-                2: begin
-                    thresh3 <= next_thresh[9:0];
-                    sample_idx3 <= sample_idx3 + 1;
-                end
-                3: begin
-                    thresh4 <= next_thresh[9:0];
-                    sample_idx4 <= sample_idx4 + 1;
-                end
-                endcase
-            end
-        end
-    end
+    latch_reg #(.WIDTH(11)) t1(
+        .clk(clk),
+        .wen(wen1),
+        .data_in(next_thresh),
+        .data_out(thresh1)
+        );
+    latch_reg #(.WIDTH(10)) t2(
+        .clk(clk),
+        .wen(wen2),
+        .data_in(next_thresh[9:0]),
+        .data_out(thresh2)
+        );
+    latch_reg #(.WIDTH(10)) t3(
+        .clk(clk),
+        .wen(wen3),
+        .data_in(next_thresh[9:0]),
+        .data_out(thresh3)
+        );
+    latch_reg #(.WIDTH(10)) t4(
+        .clk(clk),
+        .wen(wen4),
+        .data_in(next_thresh[9:0]),
+        .data_out(thresh4)
+        );
+
+
+    latch_reg #(.WIDTH(8)) s1(
+        .clk(clk),
+        .wen(wen1),
+        .data_in(next_sample_idx),
+        .data_out(sample_idx1)
+        );
+    latch_reg #(.WIDTH(8)) s2(
+        .clk(clk),
+        .wen(wen2),
+        .data_in(next_sample_idx),
+        .data_out(sample_idx2)
+        );
+    latch_reg #(.WIDTH(8)) s3(
+        .clk(clk),
+        .wen(wen3),
+        .data_in(next_sample_idx),
+        .data_out(sample_idx3)
+        );
+    latch_reg #(.WIDTH(8)) s4(
+        .clk(clk),
+        .wen(wen4),
+        .data_in(next_sample_idx),
+        .data_out(sample_idx4)
+        );
 
     // From a cello
     function [6:0] sample_rom(input [7:0] val);
