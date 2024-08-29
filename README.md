@@ -1,8 +1,10 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 
-# PWM audio example
+# Pachelbel's Canon demo for the TT08 demo competition
 
-This project is a simple example for the [PWM audio Pmod](https://github.com/MichaelBell/tt-audio-pmod)
+This project plays Pachelbel's Canon, along with accompanying Tiny Tapeout themed visuals in 800x600 SVGA (DMT mode 8).
+
+It is built locally using a [slightly tweaked version of Openlane 2](https://github.com/MichaelBell/openlane2/tree/cts-clock-control) in order to avoid excess clock buffers on latches.
 
 - [Read the documentation for project](docs/info.md)
 
