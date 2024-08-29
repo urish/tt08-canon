@@ -22,13 +22,20 @@ module tb ();
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
 
+`ifdef GL_TEST
+  // In the OL2 version I'm using VPWR and VGND are inout for some reason
+  // so must be assigned like this
+  wire vpwr = 1'b1 ? 1'b1 : 1'bz;
+  wire vgnd = 1'b1 ? 1'b0 : 1'bz;
+`endif
+
   // Replace tt_um_example with your module name:
   tt_um_MichaelBell_canon user_project (
 
       // Include power ports for the Gate Level test:
 `ifdef GL_TEST
-      .VPWR(1'b1),
-      .VGND(1'b0),
+      .VPWR(vpwr),
+      .VGND(vgnd),
 `endif
 
       .ui_in  (ui_in),    // Dedicated inputs
