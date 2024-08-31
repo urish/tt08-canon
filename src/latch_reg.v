@@ -34,6 +34,8 @@ module latch_reg #(
     wire clk_b;
     wire gated_clk;
 
+    // Lint for sky130 cells expects power pins, so disable the warning
+    /* verilator lint_off PINMISSING */
     sky130_fd_sc_hd__inv_1 CLKINV(.Y(clk_b), .A(clk));
     sky130_fd_sc_hd__dlclkp_4 CG( .CLK(clk_b), .GCLK(gated_clk), .GATE(wen) );
 
@@ -43,6 +45,7 @@ module latch_reg #(
             sky130_fd_sc_hd__dlxtp_1 state (.Q(data_out[i]), .D(data_in[i]), .GATE(gated_clk) );
         end
     endgenerate
+    /* verilator lint_on PINMISSING */
 `endif
 `endif
 

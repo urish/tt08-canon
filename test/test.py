@@ -30,8 +30,8 @@ async def do_start(dut, fast_start = 0):
 
 
 @cocotb.test()
-async def test_start(dut):
-    await do_start(dut, 2)
+async def test_audio(dut):
+    await do_start(dut, 1)
 
     await Timer(1000, "us")
 

@@ -27,7 +27,7 @@ module tt_um_MichaelBell_canon (
 
         .pwm(pwm),
 
-        .fast_start(ui_in[1:0]),
+        .fast_start(ui_in[0]),
 
         .low_count(low_count),
         .crotchet(crotchet)
@@ -40,7 +40,7 @@ module tt_um_MichaelBell_canon (
         .rst_n(rst_n),
 
         .low_count(low_count),
-        .crotchet(crotchet),
+        .crotchet(crotchet ^ ui_in[7:1]),
 
         .hsync(uo_out[7]),
         .vsync(uo_out[3]),
@@ -62,6 +62,6 @@ module tt_um_MichaelBell_canon (
   assign uio_oe  = 8'b10000000;
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, uio_in, ui_in, 1'b0};
+  wire _unused = &{ena, uio_in, 1'b0};
 
 endmodule
