@@ -45,3 +45,4 @@ jobs:
           path: |
             test/sim_build/rtl/tb.fst
             test/results.xml
+            test/frame*.png

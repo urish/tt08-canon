@@ -15,6 +15,9 @@ module tb ();
   wire hsync;
   wire vsync;
   wire [5:0] rgb;
+  wire [1:0] red;
+  wire [1:0] green;
+  wire [1:0] blue;
 
   reg [7:0] ui_in;
   reg [7:0] uio_in;
@@ -53,5 +56,8 @@ module tb ();
   assign hsync = uo_out[7];
   assign vsync = uo_out[3];
   assign rgb = {uo_out[0], uo_out[4], uo_out[1], uo_out[5], uo_out[2], uo_out[6]};
+  assign red = rgb[5:4];
+  assign green = rgb[3:2];
+  assign blue = rgb[1:0];
 
 endmodule
