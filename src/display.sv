@@ -702,7 +702,7 @@ default: x_offset = 8'd0;
 
     logic [5:0] rainbow_colour;
     logic [6:0] rainbow_in;
-    assign rainbow_in = y_pos[6:0] + ((frame_crotchet[5:4] == 2'b01 || frame_crotchet[5:3] == 3'b100) ? {frame[4:0], 2'b00} : 7'h40) + ((frame_crotchet[5:2] >= 4'b0111) ? {2'b00, wave[9:5]} : 7'h0);
+    assign rainbow_in = y_pos[6:0] + ((frame_crotchet[5:4] == 2'b01 || frame_crotchet[5:3] == 3'b100) ? {frame[4] ^ 1'b1, frame[3:0], 2'b00} : 7'h40) + ((frame_crotchet[5:2] >= 4'b0111) ? {2'b00, wave[9:5]} : 7'h0);
     assign rainbow_colour = rainbow(rainbow_in[6:3]);
 
     always_ff @(posedge clk) begin
