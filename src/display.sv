@@ -39,7 +39,8 @@ module display (
     // 13 phrases of 8 crotchets in total.
     function [6:0] y_idx_reset_value(input [6:0] idx);
         case (idx)
-        0,1,2,3,4: y_idx_reset_value = 7'd0;
+        0: y_idx_reset_value = 7'd63;
+        1,2,3,4: y_idx_reset_value = 7'd0;
         5,6,7: y_idx_reset_value = 7'd8;
         8: y_idx_reset_value = 7'd23;
         9: y_idx_reset_value = 7'd22;
@@ -66,6 +67,7 @@ module display (
         76,77,78,79: y_idx_reset_value = 7'd36;
         80,81,82,83,84,85,86,87: y_idx_reset_value = 7'd40;
         88,89,90,91: y_idx_reset_value = 7'd60;
+        92,93,94,95: y_idx_reset_value = 7'd48;
         104,105,106,107: y_idx_reset_value = 7'd0;
         108,109,110,111: y_idx_reset_value = 7'd8;
         112,113,114,115,116,117,118,119: y_idx_reset_value = 7'd8;
@@ -79,6 +81,7 @@ module display (
         case (idx)
         default: frame_reset_ctrl = 1'b0;
         0: frame_reset_ctrl = 1'b1;
+        1: frame_reset_ctrl = 1'b1;
         8: frame_reset_ctrl = 1'b1;
         16: frame_reset_ctrl = 1'b1;
         //24: frame_reset_ctrl = 1'b1;
@@ -101,13 +104,6 @@ module display (
         endcase
     endfunction
 
-    function frame_count_ctrl(input [6:0] idx);
-        case (idx)
-        default: frame_count_ctrl = 1'b1;
-        0: frame_count_ctrl = 1'b0;
-        endcase
-    endfunction
-
     logic [6:0] frame_crotchet;
 
     logic [9:0] frame;  // Around 416 frames per phrase
@@ -118,7 +114,7 @@ module display (
         end
         else if (next_frame) begin
             frame_crotchet <= crotchet;
-            frame <= frame + {8'h0, frame_count_ctrl(crotchet)};
+            frame <= frame + 1;
             if (frame_crotchet != crotchet) begin
                 if (frame_reset_ctrl(crotchet)) frame <= 0;
             end
@@ -198,6 +194,13 @@ module display (
 45: y_value = 10'd239;
 46: y_value = 10'h1ff;
 
+// "8"
+48: y_value = 10'd74;
+49: y_value = 10'd75;
+50: y_value = 10'd224;
+51: y_value = 10'd225;
+52: y_value = 10'h1ff;
+
 // Bounce - square diagnoally down
 56: y_value = 10'd0;
 57: y_value = 10'd30;
@@ -271,6 +274,12 @@ default: y_value = 10'dx;
 44: y_offset = 8'd0;
 45: y_offset = 8'd0;
 46: y_offset = 8'd0;
+
+48: y_offset = -8'd15;
+49: y_offset = 8'd15;
+50: y_offset = -8'd15;
+51: y_offset = 8'd15;
+52: y_offset = 8'd0;
 
 56: y_offset = 8'd92;
 57: y_offset = 8'd92;
@@ -431,6 +440,27 @@ default: y_offset = 8'dx;
 182: x_value = 10'h1ff;
 183: x_value = 10'h1ff;
 
+192: x_value = 10'd0;
+193: x_value = 10'h1ff;
+194: x_value = 10'h1ff;
+195: x_value = 10'h1ff;
+196: x_value = 10'd0;
+197: x_value = 10'd199;
+198: x_value = 10'd200;
+199: x_value = 10'h1ff;
+200: x_value = 10'd0;
+201: x_value = 10'h1ff;
+202: x_value = 10'h1ff;
+203: x_value = 10'h1ff;
+204: x_value = 10'd0;
+205: x_value = 10'd199;
+206: x_value = 10'd200;
+207: x_value = 10'h1ff;
+208: x_value = 10'd0;
+209: x_value = 10'h1ff;
+210: x_value = 10'h1ff;
+211: x_value = 10'h1ff;
+
 228: x_value = 10'd208;
 229: x_value = 10'd234;
 230: x_value = 10'h1ff;
@@ -487,18 +517,24 @@ default: x_value = 10'h1ff;
  150: x_offset = -8'd51;
  151: x_offset = -8'd43;
 
-164: x_offset = -8'd51;
-165: x_offset = -8'd51;
-168: x_offset = -8'd51;
-169: x_offset = -8'd51;
-172: x_offset = -8'd51;
-173: x_offset = -8'd51;
-176: x_offset = -8'd51;
-177: x_offset = -8'd51;
-178: x_offset = -8'd51;
-179: x_offset = -8'd51;
-180: x_offset = -8'd51;
-181: x_offset = -8'd51;
+164: x_offset = -8'd55;
+165: x_offset = -8'd55;
+168: x_offset = -8'd55;
+169: x_offset = -8'd55;
+172: x_offset = -8'd55;
+173: x_offset = -8'd55;
+176: x_offset = -8'd55;
+177: x_offset = -8'd55;
+178: x_offset = -8'd55;
+179: x_offset = -8'd55;
+180: x_offset = -8'd55;
+181: x_offset = -8'd55;
+
+197: x_offset = -8'd24;
+198: x_offset = 8'd24;
+
+205: x_offset = -8'd24;
+206: x_offset = 8'd24;
 
  228: x_offset = 8'd90;
  229: x_offset = 8'd90;
@@ -658,7 +694,10 @@ default: x_offset = 8'd0;
     logic [4:0] fade;
     assign sine_in = x_pos[4:0] + ((frame_crotchet[5:2] == 4'b0111) ? 0 : frame[4:0]);
     assign sine_out = sine(sine_in);
-    assign fade = ((frame_crotchet[5:2] == 4'b0111) ? frame[7:3] : 5'd27);
+    assign fade = (frame_crotchet[5:2] == 4'b0111) ? frame[7:3] : 
+                  (frame_crotchet[5:2] == 4'b1000) ? 5'd26 - frame[7:3] :
+                  (frame_crotchet[5:2] == 4'b1001) ? 5'd6 + frame[7:3] :
+                       5'd26;
     assign wave = sine_out * fade;
 
     logic [5:0] rainbow_colour;
@@ -673,13 +712,13 @@ default: x_offset = 8'd0;
         else begin
             if (frame_crotchet[6]) begin
                 if (frame_crotchet[5:2] == 0) begin
-                    if (in_line) colour <= diamond_dist[6:1];
+                    if (in_line) colour <= diamond_dist[6:1] - 6'd18;
                     else colour <= {1'b0, rainbow_colour[5], 1'b0, rainbow_colour[3], 1'b0, rainbow_colour[1]};
-                end else if (frame_crotchet[5:4] == 2'h3) begin
+                end else if (frame_crotchet[5:4] == 2'b11) begin
                     if (in_line) colour <= rainbow_colour;
                     else colour <= 0;
                 end else begin
-                    if (in_line) colour <= rainbow_colour;
+                    if (in_line ^ (frame_crotchet[5:3] == 3'b101)) colour <= rainbow_colour;
                     else colour <= {1'b0, rainbow_colour[5], 1'b0, rainbow_colour[3], 1'b0, rainbow_colour[1]};
                 end
             end else begin
@@ -695,7 +734,7 @@ default: x_offset = 8'd0;
                             colour <= {diamond_colour_red[2:1], diamond_colour_g, diamond_colour_b};
                         end
                     end else begin
-                        if (in_line) colour <= frame_crotchet[2] ? frame_plus_dist : diamond_dist[6:1];
+                        if (in_line) colour <= (frame_crotchet[2] ? frame_plus_dist : (diamond_dist[6:1] - (frame_crotchet[3] ? 6'd40 : 0)));
                         else colour <= 0;
                     end
                 end

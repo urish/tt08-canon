@@ -56,7 +56,7 @@ module pwm_audio_top (
         .rst_n(rst_n),
 
         .low_count(low_count),
-        .crotchet(crotchet /* ^ 7'h40 */),
+        .crotchet(crotchet /* + 7'h38 */),
 
         .hsync(uo_out[7]),
         .vsync(uo_out[3]),
