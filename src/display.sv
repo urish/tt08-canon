@@ -62,16 +62,15 @@ module display (
         63: y_idx_reset_value = 7'd16;
         64,65,66,67: y_idx_reset_value = 7'd31;
         68,69,70,71: y_idx_reset_value = 7'd32;
-        72,73,74,75: y_idx_reset_value = 7'd40;
-        76,77,78,79: y_idx_reset_value = 7'd35;
-        80: y_idx_reset_value = 7'd40;
-        81,82,83,84,85,86,87: y_idx_reset_value = 7'd38;
-        88,89,90,91: y_idx_reset_value = 7'd44;
+        72,73,74,75: y_idx_reset_value = 7'd56;
+        76,77,78,79: y_idx_reset_value = 7'd36;
+        80,81,82,83,84,85,86,87: y_idx_reset_value = 7'd40;
+        88,89,90,91: y_idx_reset_value = 7'd60;
         104,105,106,107: y_idx_reset_value = 7'd0;
         108,109,110,111: y_idx_reset_value = 7'd8;
         112,113,114,115,116,117,118,119: y_idx_reset_value = 7'd8;
         120,121,122,123: y_idx_reset_value = 7'd8;
-        124,125,126,127: y_idx_reset_value = 7'd47;
+        124,125,126,127: y_idx_reset_value = 7'd63;
         default: y_idx_reset_value = 7'd15;
         endcase
     endfunction
@@ -186,26 +185,31 @@ module display (
 34: y_value = 10'h1ff;
 
 // Two squares up
-35: y_value = 10'd299;
-36: y_value = 10'd329;
-37: y_value = 10'h1ff;
+36: y_value = 10'd299;
+37: y_value = 10'd329;
+38: y_value = 10'h1ff;
 
-// Expanding square
-38: y_value = 10'd920;
-39: y_value = 10'd930;
-
-// Bounce - square diagnoally down
-40: y_value = 10'd0;
-41: y_value = 10'd30;
-42: y_value = 10'h1ff;
-
-// Slide across
-44: y_value = 10'd0;
-45: y_value = 10'd299;
+// Scrolling T
+40: y_value = 10'd52;
+41: y_value = 10'd86;
+42: y_value = 10'd115;
+43: y_value = 10'd148;
+44: y_value = 10'd174;
+45: y_value = 10'd239;
 46: y_value = 10'h1ff;
 
+// Bounce - square diagnoally down
+56: y_value = 10'd0;
+57: y_value = 10'd30;
+58: y_value = 10'h1ff;
+
+// Slide across
+60: y_value = 10'd0;
+61: y_value = 10'd299;
+62: y_value = 10'h1ff;
+
 // All outside
-47: y_value = 10'h1ff;
+63: y_value = 10'h1ff;
 
 default: y_value = 10'dx;
         endcase
@@ -256,22 +260,27 @@ default: y_value = 10'dx;
 33: y_offset = -8'd92;
 34: y_offset = 8'd0;
 
-35: y_offset = -8'd92;
 36: y_offset = -8'd92;
-37: y_offset = 8'd0;
+37: y_offset = -8'd92;
+38: y_offset = 8'd0;
 
-38: y_offset = 8'd60;
-39: y_offset = 8'd120;
-
-40: y_offset = 8'd92;
-41: y_offset = 8'd92;
+40: y_offset = 8'd0;
+41: y_offset = 8'd0;
 42: y_offset = 8'd0;
-
-44: y_offset = 8'd46;
-45: y_offset = -8'd46;
+43: y_offset = 8'd0;
+44: y_offset = 8'd0;
+45: y_offset = 8'd0;
 46: y_offset = 8'd0;
 
-47: y_offset = 8'd0;
+56: y_offset = 8'd92;
+57: y_offset = 8'd92;
+58: y_offset = 8'd0;
+
+60: y_offset = 8'd46;
+61: y_offset = -8'd46;
+62: y_offset = 8'd0;
+
+63: y_offset = 8'd0;
 
 default: y_offset = 8'dx;
         endcase
@@ -396,27 +405,45 @@ default: y_offset = 8'dx;
 134: x_value = 10'h1ff;
 135: x_value = 10'h1ff;
 
-144: x_value = 10'd0;
-145: x_value = 10'd0;
-146: x_value = 10'd399;
-147: x_value = 10'd399;
+148: x_value = 10'd0;
+149: x_value = 10'd0;
+150: x_value = 10'd399;
+151: x_value = 10'd399;
 
-156: x_value = 10'd0;
-157: x_value = 10'd0;
-
-164: x_value = 10'd208;
-165: x_value = 10'd234;
+164: x_value = 10'd110 + 10'h100;
+165: x_value = 10'd221 + 10'h100;
 166: x_value = 10'h1ff;
 167: x_value = 10'h1ff;
+168: x_value = 10'd150 + 10'h100;
+169: x_value = 10'd183 + 10'h100;
+170: x_value = 10'h1ff;
+171: x_value = 10'h1ff;
+172: x_value = 10'd150 + 10'h100;
+173: x_value = 10'd284 + 10'h100;
+174: x_value = 10'h1ff;
+175: x_value = 10'h1ff;
+176: x_value = 10'd150 + 10'h100;
+177: x_value = 10'd183 + 10'h100;
+178: x_value = 10'd212 + 10'h100;
+179: x_value = 10'd245 + 10'h100;
+180: x_value = 10'd212 + 10'h100;
+181: x_value = 10'd245 + 10'h100;
+182: x_value = 10'h1ff;
+183: x_value = 10'h1ff;
 
-176: x_value = 10'd399;
-177: x_value = 10'h1ff;
-178: x_value = 10'h1ff;
-179: x_value = 10'h1ff;
-184: x_value = 10'd0;
-185: x_value = 10'h0;
-186: x_value = 10'h1ff;
-187: x_value = 10'h1ff;
+228: x_value = 10'd208;
+229: x_value = 10'd234;
+230: x_value = 10'h1ff;
+231: x_value = 10'h1ff;
+
+240: x_value = 10'd399;
+241: x_value = 10'h1ff;
+242: x_value = 10'h1ff;
+243: x_value = 10'h1ff;
+248: x_value = 10'd0;
+249: x_value = 10'h0;
+250: x_value = 10'h1ff;
+251: x_value = 10'h1ff;
 
 
 default: x_value = 10'h1ff;
@@ -455,19 +482,29 @@ default: x_value = 10'h1ff;
  132: x_offset = 8'd64;
  133: x_offset = 8'd64;
 
- 144: x_offset = 8'd64;
- 145: x_offset = 8'd72;
- 146: x_offset = -8'd51;
- 147: x_offset = -8'd43;
+ 148: x_offset = 8'd64;
+ 149: x_offset = 8'd72;
+ 150: x_offset = -8'd51;
+ 151: x_offset = -8'd43;
 
- 156: x_offset = 8'd40;
- 157: x_offset = 8'd80;
+164: x_offset = -8'd51;
+165: x_offset = -8'd51;
+168: x_offset = -8'd51;
+169: x_offset = -8'd51;
+172: x_offset = -8'd51;
+173: x_offset = -8'd51;
+176: x_offset = -8'd51;
+177: x_offset = -8'd51;
+178: x_offset = -8'd51;
+179: x_offset = -8'd51;
+180: x_offset = -8'd51;
+181: x_offset = -8'd51;
 
- 164: x_offset = 8'd90;
- 165: x_offset = 8'd90;
+ 228: x_offset = 8'd90;
+ 229: x_offset = 8'd90;
 
- 176: x_offset = -8'd123;
- 185: x_offset = 8'd123;
+ 240: x_offset = -8'd123;
+ 249: x_offset = 8'd123;
 
 default: x_offset = 8'd0;
         endcase
