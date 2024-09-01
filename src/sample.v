@@ -604,7 +604,7 @@ module pwm_sample (
     reg [7:0] sample_val;
     always @* begin
         case(counter[1:0])
-        0: sample_val = 7'dx;
+        0: sample_val = 8'dx;
         1: sample_val = sample_idx2;
         2: sample_val = sample_idx3;
         3: sample_val = sample_idx4;

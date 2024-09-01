@@ -13,7 +13,7 @@
 
   "//": "PL_TARGET_DENSITY - You can increase this if Global Placement fails with error GPL-0302.",
   "//": "Users have reported that values up to 0.8 worked well for them.",
-  "PL_TARGET_DENSITY": 0.90,
+  "PL_TARGET_DENSITY_PCT": 90,
 
   "//": "CLOCK_PERIOD - Increase this in case you are getting setup time violations.",
   "//": "The value is in nanoseconds, so 20ns == 50MHz.",
@@ -21,7 +21,7 @@
 
   "//": "Hold slack margin - Increase them in case you are getting hold violations.",
   "PL_RESIZER_HOLD_SLACK_MARGIN": 0.1,
-  "GLB_RESIZER_HOLD_SLACK_MARGIN": 0.05,
+  "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.05,
 
   "//": "RUN_LINTER, LINTER_INCLUDE_PDK_MODELS - Disabling the linter is not recommended!",
   "RUN_LINTER": 1,
@@ -30,12 +30,21 @@
   "//": "Synth strategy",
   "SYNTH_STRATEGY": "AREA 2",
 
+  "//": "Clock gating",
+  "USE_LIGHTER": 1,
+
+  "//": "SDC Customizations",
+  "FALLBACK_SDC_FILE": "src/base.sdc",
+
   "//": "Routing tweaks",
   "DESIGN_REPAIR_MAX_SLEW_PCT": 35,
   "DESIGN_REPAIR_REMOVE_BUFFERS": 1,
+  "RUN_HEURISTIC_DIODE_INSERTION": 1,
+  "RUN_ANTENNA_REPAIR": 0,
+  "HEURISTIC_ANTENNA_THRESHOLD": 300,
 
   "//": "Increase number of routing threads",
-  "ROUTING_CORES": 8,
+  "DRT_THREADS": 8,
 
   "//": "If you need a custom clock configuration, read the following documentation first:",
   "//": "https://tinytapeout.com/faq/#how-can-i-map-an-additional-external-clock-to-one-of-the-gpios",
@@ -52,10 +61,7 @@
   "RUN_KLAYOUT_DRC": 0,
 
   "//": "Don't put clock buffers on the outputs",
-  "PL_RESIZER_BUFFER_OUTPUT_PORTS": 0,
-
-  "//": "Allow use of specific sky130 cells",
-  "SYNTH_READ_BLACKBOX_LIB": 1,
+  "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS": 0,
 
   "//": "Reduce wasted space",
   "TOP_MARGIN_MULT": 1,
@@ -66,7 +72,6 @@
   "//": "Absolute die size",
   "FP_SIZING": "absolute",
 
-  "PL_BASIC_PLACEMENT": 0,
   "GRT_ALLOW_CONGESTION": 0,
 
   "FP_IO_HLENGTH": 2,

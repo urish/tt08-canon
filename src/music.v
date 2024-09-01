@@ -60,7 +60,7 @@ module pwm_music (
         for (i = 1; i <= 3; i = i+1) begin
             always @(posedge clk) begin
                 if (!rst_n) begin
-                    violin_note_idx[i] <= 9'd511 - 8*i + {fast_start, 4'h0};
+                    violin_note_idx[i] <= 9'd511 - 8*i + {3'd0, fast_start, 4'h0};
                 end
                 else begin
                     if (count[21:0] == i && (count[24:22] & violin_duration_mask) == 0) begin
@@ -411,10 +411,10 @@ default: violin_freq = 10'dx;
 
     function [2:0] raw_sine_rom(input [1:0] val);
         case (val)
-0: raw_sine_rom = 4'd1;
-1: raw_sine_rom = 4'd3;
-2: raw_sine_rom = 4'd6;
-3: raw_sine_rom = 4'd7;
+0: raw_sine_rom = 3'd1;
+1: raw_sine_rom = 3'd3;
+2: raw_sine_rom = 3'd6;
+3: raw_sine_rom = 3'd7;
         endcase
     endfunction
 

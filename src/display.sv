@@ -742,6 +742,6 @@ default: x_offset = 8'd0;
         end
     end
 
-    wire _unused = &{diamond_colour_red[0], 1'b0};
+    wire _unused = &{diamond_colour_red[0], wave[4:0], rainbow_in[2:0], 1'b0};
 
 endmodule
