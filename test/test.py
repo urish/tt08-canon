@@ -216,9 +216,9 @@ async def frame_dump(dut, frame, filename):
         for j in range(800):
             assert dut.vsync.value == 0
             assert dut.hsync.value == 0
-            red = dut.red.value * 63
-            green = dut.green.value * 63
-            blue = dut.blue.value * 63
+            red = dut.red.value * 85
+            green = dut.green.value * 85
+            blue = dut.blue.value * 85
             image.putpixel((j, i), (red, green, blue))
             await ClockCycles(dut.clk, 1)
         for j in range(24):
@@ -254,4 +254,4 @@ async def test_frames(dut):
     await frame_dump(dut, 20, "frame20.png")
     await frame_dump(dut, 23, "frame23.png")
     await frame_dump(dut, 24, "frame24.png")
-    await frame_dump(dut, 26, "frame26.png")
+    await frame_dump(dut, 28, "frame28.png")

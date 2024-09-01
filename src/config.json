@@ -17,7 +17,7 @@
 
   "//": "CLOCK_PERIOD - Increase this in case you are getting setup time violations.",
   "//": "The value is in nanoseconds, so 20ns == 50MHz.",
-  "CLOCK_PERIOD": 25,
+  "CLOCK_PERIOD": 27,
 
   "//": "Hold slack margin - Increase them in case you are getting hold violations.",
   "PL_RESIZER_HOLD_SLACK_MARGIN": 0.1,
@@ -31,9 +31,8 @@
   "SYNTH_STRATEGY": "AREA 2",
 
   "//": "Routing tweaks",
-  "DESIGN_REPAIR_MAX_SLEW_PCT": 30,
+  "DESIGN_REPAIR_MAX_SLEW_PCT": 35,
   "DESIGN_REPAIR_REMOVE_BUFFERS": 1,
-  "GRT_ADJUSTMENT": 0.30,
 
   "//": "Increase number of routing threads",
   "ROUTING_CORES": 8,
