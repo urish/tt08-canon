@@ -4,7 +4,7 @@ module pwm_music (
     input wire clk,
     input wire rst_n,
 
-    input wire fast_start,
+    input wire [1:0] fast_start,
 
     output wire pwm,
 
@@ -60,7 +60,7 @@ module pwm_music (
         for (i = 1; i <= 3; i = i+1) begin
             always @(posedge clk) begin
                 if (!rst_n) begin
-                    violin_note_idx[i] <= 9'd511 - 8*i + (fast_start ? 16 : 0);
+                    violin_note_idx[i] <= 9'd511 - 8*i + {fast_start, 4'h0};
                 end
                 else begin
                     if (count[21:0] == i && (count[24:22] & violin_duration_mask) == 0) begin

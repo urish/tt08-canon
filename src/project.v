@@ -27,7 +27,7 @@ module tt_um_MichaelBell_canon (
 
         .pwm(pwm),
 
-        .fast_start(ui_in[0]),
+        .fast_start(ui_in[1:0]),
 
         .low_count(low_count),
         .crotchet(crotchet)
@@ -40,7 +40,7 @@ module tt_um_MichaelBell_canon (
         .rst_n(rst_n),
 
         .low_count(low_count),
-        .crotchet(crotchet ^ ui_in[7:1]),
+        .crotchet(crotchet ^ {ui_in[7:2], 1'b0}),
 
         .hsync(uo_out[7]),
         .vsync(uo_out[3]),
