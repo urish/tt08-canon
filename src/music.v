@@ -84,14 +84,14 @@ module pwm_music (
     // Cello line for Canon, 36MHz project clock
     function [10:0] cello_rom(input [2:0] idx);
         case (idx)
-0: cello_rom = 11'd956;
-1: cello_rom = 11'd1277;
-2: cello_rom = 11'd1137;
-3: cello_rom = 11'd1519;
-4: cello_rom = 11'd1433;
-5: cello_rom = 11'd1914;
-6: cello_rom = 11'd1433;
-7: cello_rom = 11'd1277;
+0: cello_rom = 11'd949;
+1: cello_rom = 11'd1270;
+2: cello_rom = 11'd1130;
+3: cello_rom = 11'd1512;
+4: cello_rom = 11'd1426;
+5: cello_rom = 11'd1907;
+6: cello_rom = 11'd1426;
+7: cello_rom = 11'd1270;
         endcase
     endfunction
 
@@ -409,6 +409,26 @@ default: violin_freq = 10'dx;
         endcase
     endfunction
 
+    function [2:0] raw_sine_rom(input [1:0] val);
+        case (val)
+0: raw_sine_rom = 4'd1;
+1: raw_sine_rom = 4'd3;
+2: raw_sine_rom = 4'd6;
+3: raw_sine_rom = 4'd7;
+        endcase
+    endfunction
+
+    // Function to compute roughly 7.5 + 7.5 * sin(2pi * val / 16)
+    function automatic [3:0] sine(input [3:0] val);
+        reg [1:0] negated_val;
+        reg [2:0] half_sine;
+        negated_val = 2'd3 - val[1:0];
+        half_sine = raw_sine_rom(val[2] ? negated_val[1:0] : val[1:0]);
+        sine = val[3] ? 3'd7 - half_sine : {1'b1, half_sine};
+    endfunction
+
+    wire [10:0] cello_div_in = cello_rom(cello_note_idx) + {7'd0, sine(count[22:19])};
+
     reg [8:0] vnote_idx;
     always @* begin
         case(count[1:0])
@@ -422,7 +442,7 @@ default: violin_freq = 10'dx;
     wire [6:0] violin_note_mux = violin_rom(vnote_idx);
     wire [9:0] violin_divider_mux = violin_freq(violin_note_mux[4:0]);
 
-    wire [10:0] cdivider = (violin_note_idx[1][8:7] == 2'b11) ? 11'd0 : cello_rom(cello_note_idx);
+    wire [10:0] cdivider = (violin_note_idx[1][8:7] == 2'b11) ? 11'd0 : cello_div_in;
     assign divider = (count[1:0] == 2'b00) ? cdivider : {1'b0, violin_divider_mux};
     assign violin_duration_mask = violin_note_mux[6:5] == 2'b10 ? 3'b111 : {1'b0,violin_note_mux[6:5]};
 
