@@ -25,6 +25,10 @@ module tb ();
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
 
+  reg [9:0] last_sample;
+
+  initial last_sample <= 0;
+
 `ifdef GL_TEST
   // In the OL2 version I'm using VPWR and VGND are inout for some reason
   // so must be assigned like this
